@@ -1,0 +1,27 @@
+[package]
+name = "openlr"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log="0.4.17"
+base64 = "0.13.0"
+clap = "2.33.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.64"
+thiserror = "1.0"
+itertools = "0.10.3"
+pathfinding = "3.0.13"
+indexmap = "1.9.1"
+rustc-hash = "1.1.0"
+num-traits = "0.2.15"
+geo= { version = "0.22.0", features = ["use-proj"] }
+priority-queue = "1.2.3"
+async-trait = "0.1.62"
+
+[dev-dependencies]
+approx = "0.5.1"
+maplit = "1.0.2"
+simple_logger = "2.2.0"
