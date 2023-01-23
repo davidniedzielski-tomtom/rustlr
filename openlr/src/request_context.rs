@@ -17,7 +17,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level >= LogLevel::Trace as u8 {
+        if self.log_level <= LogLevel::Trace as u8 {
             self.log(LogLevel::Trace, f);
         }
     }
@@ -33,7 +33,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level >= LogLevel::Info as u8 {
+        if self.log_level <= LogLevel::Info as u8 {
             self.log(LogLevel::Info, f);
         }
     }
@@ -41,7 +41,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level >= LogLevel::Warn as u8 {
+        if self.log_level <= LogLevel::Warn as u8 {
             self.log(LogLevel::Warn, f);
         }
     }
@@ -49,7 +49,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level >= LogLevel::Error as u8 {
+        if self.log_level <= LogLevel::Error as u8 {
             self.log(LogLevel::Error, f);
         }
     }
@@ -57,7 +57,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level >= LogLevel::Fatal as u8 {
+        if self.log_level <= LogLevel::Fatal as u8 {
             self.log(LogLevel::Fatal, f);
         }
     }

@@ -42,7 +42,7 @@ use request_result::RequestResult;
 
 pub async fn decode(
     id: i64,
-    locref: LocationReference,
+    locref: &LocationReference,
     map: &dyn Map,
     params: &DecodingParameters,
     level: LogLevel,
@@ -59,7 +59,7 @@ pub async fn decode(
 }
 
 pub async fn encode(
-    loc: Location,
+    loc: &Location,
     map: &dyn Map,
     params: &EncodingParameters,
     level: LogLevel,

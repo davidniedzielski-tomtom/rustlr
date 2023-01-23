@@ -67,7 +67,7 @@ fn test_mockmap() {
     map.successor_search.insert((8548148, 6566423), vec!(e2.clone()));
     
     let loc_ref = openlr::deserialize_binary("C/+zGCZJgyuvBAAh/x8rHw==").unwrap();
-    let loc = block_on(openlr::decode(1, loc_ref, &map, &DecodingParameters::default(), LogLevel::Trace));
+    let loc = block_on(openlr::decode(1, &loc_ref, &map, &DecodingParameters::default(), LogLevel::Trace));
     println!("{:?}", loc);
     
 }
