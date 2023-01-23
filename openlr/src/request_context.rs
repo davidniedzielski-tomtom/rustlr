@@ -69,7 +69,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
         Arc::clone(&self.log)
             .lock()
             .unwrap()
-            .push(LogEntry::new(SystemTime::now(), level, f()))
+            .push(LogEntry::new(level, f()))
     }
 
     pub fn get_log(&self) -> Vec<LogEntry> {

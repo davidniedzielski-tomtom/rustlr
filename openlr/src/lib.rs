@@ -33,7 +33,7 @@ use crate::errors::OpenLrErr;
 use crate::location::Location;
 use crate::location_reference::LocationReference;
 use crate::location_type::LocationType;
-use crate::log::{LogEntry, LogLevel};
+use crate::log::LogLevel;
 use crate::map::Map;
 use deserializable_reference::DeserializableReference;
 use line::LineLocationReference;
@@ -48,32 +48,14 @@ pub async fn decode(
     level: LogLevel,
 ) -> RequestResult<Location> {
     let start_time = SystemTime::now();
-    match locref {
-        LocationReference::Line(line_loc_ref) => {
-            let context = RequestContext::<DecodingParameters>::new(map, params, level);
-            let res = line_loc_ref.decode(&context).await;
-            match res {
-                Ok(line_location) => RequestResult::new(
-                    id,
-                    Ok(Location::Line(line_location)),
-                    SystemTime::now().duration_since(start_time).unwrap(),
-                    context.get_log(),
-                ),
-                Err(err) => RequestResult::new(
-                    id,
-                    Err(err),
-                    SystemTime::now().duration_since(start_time).unwrap(),
-                    Vec::<LogEntry>::new(),
-                ),
-            }
-        }
-        _ => RequestResult::new(
-            id,
-            Err(OpenLrErr::UnknownLocationTypeError),
-            SystemTime::now().duration_since(start_time).unwrap(),
-            Vec::<LogEntry>::new(),
-        ),
-    }
+    let context = RequestContext::<DecodingParameters>::new(map, params, level);
+    let result = match locref {
+        LocationReference::Line(line_loc_ref) => line_loc_ref.decode(&context).await,
+        lr => Err(OpenLrErr::UnsupportedLocationTypeError(format!("{:?}", lr))),
+    };
+
+    let elapsed = SystemTime::now().duration_since(start_time).unwrap();
+    RequestResult::new(id, result, elapsed, context.get_log())
 }
 
 pub async fn encode(
@@ -82,13 +64,7 @@ pub async fn encode(
     params: &EncodingParameters,
     level: LogLevel,
 ) -> Result<LocationReference, OpenLrErr> {
-    match loc {
-        Location::Line(loc) => {
-            let context = RequestContext::<EncodingParameters>::new(map, params, level);
-            Ok(LocationReference::Line(loc.encode(&context).await.unwrap()))
-        }
-        _ => Err(OpenLrErr::UnknownLocationTypeError),
-    }
+    todo!()
 }
 
 pub fn deserialize_binary(bin: &str) -> Result<LocationReference, OpenLrErr> {
@@ -106,7 +82,11 @@ pub fn deserialize_binary(bin: &str) -> Result<LocationReference, OpenLrErr> {
         LocationType::Line => Ok(LocationReference::Line(
             LineLocationReference::from_binary(&bytes).unwrap(),
         )),
-        _ => Err(OpenLrErr::UnknownLocationTypeError),
+        LocationType::Unknown => Err(OpenLrErr::UnknownLocationTypeError),
+        loc => Err(OpenLrErr::UnsupportedLocationTypeError(format!(
+            "{:?}",
+            loc
+        ))),
     }
 }
 

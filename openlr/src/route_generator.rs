@@ -1,5 +1,4 @@
 use crate::candidate_edge::CandidateEdge;
-use crate::edge::Edge;
 use priority_queue::PriorityQueue;
 use std::cmp::Ordering;
 

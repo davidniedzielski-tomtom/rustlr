@@ -1,5 +1,3 @@
-use std::time::SystemTime;
-
 #[derive(Clone)]
 pub enum LogLevel {
     Trace = 0,
@@ -12,18 +10,13 @@ pub enum LogLevel {
 
 #[derive(Clone)]
 pub struct LogEntry {
-    time_stamp: SystemTime,
     level: LogLevel,
     txt: String,
 }
 
 impl LogEntry {
-    pub fn new(time_stamp: SystemTime, level: LogLevel, txt: String) -> LogEntry {
-        LogEntry {
-            time_stamp,
-            level,
-            txt,
-        }
+    pub fn new(level: LogLevel, txt: String) -> LogEntry {
+        LogEntry { level, txt }
     }
 }
 

@@ -10,6 +10,8 @@ use crate::edge::Edge;
 use crate::encodable_location::EncodableLocation;
 use crate::encoding_parameters::EncodingParameters;
 use crate::errors::OpenLrErr;
+use crate::location::Location;
+use crate::location_reference::LocationReference;
 use crate::location_reference_point::LocationReferencePoint;
 use crate::request_context::RequestContext;
 use crate::route_generator::RouteGenerator;
@@ -119,7 +121,7 @@ impl DecodableReference for LineLocationReference {
     async fn decode(
         &self,
         context: &RequestContext<DecodingParameters>,
-    ) -> Result<Self::Peer, OpenLrErr> {
+    ) -> Result<Location, OpenLrErr> {
         // lrp_candidates is a vector of Candidate edges, one for each LRP
         let mut lrp_candidates: Vec<Vec<CandidateEdge>> = vec![];
 
@@ -157,9 +159,10 @@ impl DecodableReference for LineLocationReference {
             context.info(|| format!("Unable to find path for location reference {:?}", self));
             Err(OpenLrErr::NoPathFound)
         } else {
-            Ok(self
-                .build_location(location_path, lrp_start_offset, lrp_end_offset)
-                .unwrap())
+            Ok(Location::Line(
+                self.build_location(location_path, lrp_start_offset, lrp_end_offset)
+                    .unwrap(),
+            ))
         }
     }
 }
@@ -267,7 +270,7 @@ impl EncodableLocation for LineLocation {
     async fn encode(
         &self,
         context: &RequestContext<EncodingParameters>,
-    ) -> Result<Self::Peer, OpenLrErr> {
+    ) -> Result<LocationReference, OpenLrErr> {
         todo!()
     }
 }
