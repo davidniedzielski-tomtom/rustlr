@@ -25,7 +25,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level >= LogLevel::Debug as u8 {
+        if self.log_level <= LogLevel::Debug as u8 {
             self.log(LogLevel::Debug, f);
         }
     }

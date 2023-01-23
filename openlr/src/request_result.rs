@@ -2,6 +2,7 @@ use crate::errors::OpenLrErr;
 use crate::log::LogEntry;
 use std::time::Duration;
 
+#[derive(Debug)]
 pub struct RequestResult<T> {
     pub id: i64,
     pub result: Result<T, OpenLrErr>,

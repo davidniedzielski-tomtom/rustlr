@@ -38,7 +38,7 @@ impl Edge {
 
     /// Returns the end point of the line.
     pub(crate) fn get_end_point(&self) -> Point<f64> {
-        self.geom.points().nth(self.geom.coords_count()).unwrap()
+        self.geom.points().nth(self.geom.coords_count()-1).unwrap()
     }
 
     /// Returns the line's FOW

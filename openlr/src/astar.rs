@@ -1,7 +1,6 @@
 use crate::candidate_edge::CandidateEdge;
 use crate::decoding_parameters::DecodingParameters;
 use crate::edge::Edge;
-use crate::map::Map;
 use crate::request_context::RequestContext;
 use crate::OpenLrErr;
 use crate::OpenLrErr::NoSubPathFound;
