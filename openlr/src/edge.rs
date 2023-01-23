@@ -1,12 +1,14 @@
+use crate::errors::OpenLrErr;
 use crate::fow::FOW;
 use crate::frc::FRC;
 use geo::{
-    Bearing, Closest, ClosestPoint, CoordsIter, Geometry, HaversineDestination, HaversineDistance,
-    LineInterpolatePoint, LineLocatePoint, LineString, Point,
+    Bearing, Closest, ClosestPoint, Coord, CoordsIter, Geometry, HaversineDestination,
+    HaversineDistance, LineInterpolatePoint, LineLocatePoint, LineString, Point,
 };
 use log::warn;
 use serde::ser::SerializeStruct;
 use serde::Serialize;
+use wkt::{geo_types_from_wkt, TryFromWkt};
 
 #[derive(Debug, Clone)]
 pub struct Edge {
@@ -38,7 +40,10 @@ impl Edge {
 
     /// Returns the end point of the line.
     pub(crate) fn get_end_point(&self) -> Point<f64> {
-        self.geom.points().nth(self.geom.coords_count()-1).unwrap()
+        self.geom
+            .points()
+            .nth(self.geom.coords_count() - 1)
+            .unwrap()
     }
 
     /// Returns the line's FOW
@@ -147,6 +152,97 @@ impl Edge {
             }
         }
     }
+
+    /// Constructor that accepts pre-build geometry
+    pub fn new(
+        id: i64,
+        meta: String,
+        fow: FOW,
+        frc: FRC,
+        start_node: i64,
+        end_node: i64,
+        len: u32,
+        geom: LineString,
+    ) -> Self {
+        Self {
+            id,
+            meta,
+            fow,
+            frc,
+            start_node,
+            end_node,
+            len,
+            geom,
+        }
+    }
+    /// Constructor that build the geometry from a vector of Coords
+    pub fn new_from_coords(
+        id: i64,
+        meta: String,
+        fow: FOW,
+        frc: FRC,
+        start_node: i64,
+        end_node: i64,
+        len: u32,
+        geom: Vec<Coord>,
+    ) -> Self {
+        Self {
+            id,
+            meta,
+            fow,
+            frc,
+            start_node,
+            end_node,
+            len,
+            geom: LineString::new(geom),
+        }
+    }
+    /// Constructor that builds the geometry from WKT
+    pub fn new_from_wkt(
+        id: i64,
+        meta: String,
+        fow: FOW,
+        frc: FRC,
+        start_node: i64,
+        end_node: i64,
+        len: u32,
+        geom: &str,
+    ) -> Result<Self, OpenLrErr> {
+        match LineString::try_from_wkt_str(geom) {
+            Ok(g) => Ok(Self {
+                id,
+                meta,
+                fow,
+                frc,
+                start_node,
+                end_node,
+                len,
+                geom: g,
+            }),
+            _ => Err(OpenLrErr::InvalidEdgeWKT),
+        }
+    }
+    /// Constructor that builds the Edge by reversing another edge and negates the id
+    pub fn new_from_reverse(peer: &Self) -> Self {
+        let mut rev_coords: Vec<&Coord> = peer.geom.coords().collect();
+        rev_coords.reverse();
+        let g = rev_coords
+            .into_iter()
+            .map(|e| e.clone())
+            .collect::<Vec<Coord>>();
+        //let g = rev_coords.iter().map(|e|*e.clone()).collect::<Vec<Coord>>();
+        let g_r = LineString::new(g);
+        Self {
+            id: -peer.id,
+            meta: peer.meta.clone(),
+            fow: peer.fow,
+            frc: peer.frc,
+            start_node: peer.end_node,
+            end_node: peer.start_node,
+            len: peer.len,
+            geom: g_r,
+        }
+    }
 }
 
 impl Serialize for Edge {
@@ -167,5 +263,35 @@ impl Serialize for Edge {
         state.serialize_field("frc", &self.frc.to_usize())?;
         state.serialize_field("geom", &coords)?;
         state.end()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let e1 = Edge::new_from_wkt(
+            8548148,
+            "1152964797973692416".to_owned(),
+            FOW::SingleCarriageway,
+            FRC::FRC5,
+            1111111,
+            2222222,
+            199,
+            "LINESTRING(-0.42244 53.84129,-0.42241 53.84117,-0.4224 53.84109,-0.42235 53.84015,-0.42221 53.83952)").unwrap();
+        let e2 = Edge::new_from_reverse(&e1);
+        assert_eq!(e2.id, -e1.id);
+        assert_eq!(e2.meta, e1.meta);
+        assert_eq!(e2.fow, e1.fow);
+        assert_eq!(e2.frc, e1.frc);
+        assert_eq!(e2.start_node, e1.end_node);
+        assert_eq!(e2.end_node, e1.start_node);
+        assert_eq!(e2.len, e1.len);
+        let e1_coords = e1.geom.coords().collect::<Vec<&Coord>>();
+        let e2_coords = e2.geom.coords().collect::<Vec<&Coord>>();
+        assert_eq!(e2_coords.first(), e1_coords.last());
+        assert_eq!(e2_coords.last(), e1_coords.first());
     }
 }

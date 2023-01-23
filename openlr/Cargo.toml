@@ -20,6 +20,7 @@ num-traits = "0.2.15"
 geo= { version = "0.22.0", features = ["use-proj"] }
 priority-queue = "1.2.3"
 async-trait = "0.1.62"
+wkt = "0.10.3"
 
 [dev-dependencies]
 approx = "0.5.1"

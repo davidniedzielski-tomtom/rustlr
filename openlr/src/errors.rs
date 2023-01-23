@@ -2,6 +2,8 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum OpenLrErr {
+    #[error("Invalid Edge WKT")]
+    InvalidEdgeWKT,
     #[error("Unknown LocationType")]
     UnknownLocationTypeError,
     #[error("Unsupported LocationType: {0}")]

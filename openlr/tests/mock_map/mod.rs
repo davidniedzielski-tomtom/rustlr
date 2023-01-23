@@ -44,16 +44,19 @@ impl Map for MockMap {
         lat: f64,
         radius: u32,
     ) -> Result<Vec<Edge>, OpenLrErr> {
-        println!("radius search: lon: {}, lat: {}, radius: {}", lon, lat, radius);
+        println!(
+            "radius search: lon: {}, lat: {}, radius: {}",
+            lon, lat, radius
+        );
         match self.radius_search.get(&RadiusSearchKey((lon, lat, radius))) {
             Some(v) => {
                 println!("Found");
                 Ok(v.clone())
-            },
+            }
             _ => {
                 println!("No match");
                 Ok(Vec::<Edge>::new())
-            },
+            }
         }
     }
 
@@ -62,16 +65,19 @@ impl Map for MockMap {
         src_edge_id: i64,
         src_node_id: i64,
     ) -> Result<Vec<Edge>, OpenLrErr> {
-        println!("gen next: src_edge: {}, src_node: {}", src_edge_id, src_node_id);
+        println!(
+            "gen next: src_edge: {}, src_node: {}",
+            src_edge_id, src_node_id
+        );
         match self.successor_search.get(&(src_edge_id, src_node_id)) {
             Some(v) => {
                 println!("Found");
                 Ok(v.clone())
-            },
+            }
             _ => {
                 println!("No match");
                 Ok(Vec::<Edge>::new())
-            },
+            }
         }
     }
 }

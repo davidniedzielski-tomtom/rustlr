@@ -110,7 +110,7 @@ impl LineLocationReference {
             } else {
                 None
             },
-            lines: pathvec[start_index..end_index + 1].to_owned(),
+            edges: pathvec[start_index..end_index + 1].to_owned(),
         })
     }
 }
@@ -259,7 +259,7 @@ impl SerializableReference for LineLocationReference {
 
 #[derive(Serialize, Debug)]
 pub struct LineLocation {
-    pub lines: Vec<Edge>,
+    pub edges: Vec<Edge>,
     pub p_off: Option<(u32, u32)>,
     pub n_off: Option<(u32, u32)>,
 }
