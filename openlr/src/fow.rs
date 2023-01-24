@@ -28,7 +28,7 @@ impl FOW {
             FOW::Other => 7,
         }
     }
-    pub(crate) fn from_u8(i: u8) -> Self {
+    pub fn from_u8(i: u8) -> Self {
         match i {
             0 => FOW::Undefined,
             1 => FOW::Motorway,

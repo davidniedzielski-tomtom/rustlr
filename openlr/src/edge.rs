@@ -8,7 +8,8 @@ use geo::{
 use log::warn;
 use serde::ser::SerializeStruct;
 use serde::Serialize;
-use wkt::{geo_types_from_wkt, TryFromWkt};
+use std::hash::{Hash, Hasher};
+use wkt::TryFromWkt;
 
 #[derive(Debug, Clone)]
 pub struct Edge {
@@ -22,24 +23,37 @@ pub struct Edge {
     pub geom: LineString,
 }
 
+impl PartialEq<Self> for Edge {
+    fn eq(&self, other: &Self) -> bool {
+        self.get_id() == other.get_id()
+    }
+}
+
+impl Eq for Edge {}
+impl Hash for Edge {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.get_id().hash(state)
+    }
+}
+
 impl Edge {
     /// Returns the start node of the line.
-    pub(crate) fn get_start_node_id(&self) -> i64 {
+    pub fn get_start_node_id(&self) -> i64 {
         self.start_node
     }
 
     /// Returns the end node of the line.
-    pub(crate) fn get_end_node_id(&self) -> i64 {
+    pub fn get_end_node_id(&self) -> i64 {
         self.end_node
     }
 
     /// Returns the start point of the line.
-    pub(crate) fn get_start_point(&self) -> Point<f64> {
-        self.geom.points().nth(1).unwrap()
+    pub fn get_start_point(&self) -> Point<f64> {
+        self.geom.points().nth(0).unwrap()
     }
 
     /// Returns the end point of the line.
-    pub(crate) fn get_end_point(&self) -> Point<f64> {
+    pub fn get_end_point(&self) -> Point<f64> {
         self.geom
             .points()
             .nth(self.geom.coords_count() - 1)
@@ -47,12 +61,12 @@ impl Edge {
     }
 
     /// Returns the line's FOW
-    pub(crate) fn get_fow(&self) -> FOW {
+    pub fn get_fow(&self) -> FOW {
         self.fow
     }
 
     /// Return the line's FRC
-    pub(crate) fn get_frc(&self) -> FRC {
+    pub fn get_frc(&self) -> FRC {
         self.frc
     }
 
@@ -61,30 +75,30 @@ impl Edge {
     /// length of the line the end node is returned! The x-coordinate of the
     /// point refers to the longitude value and the y-coordinate refers to the
     /// latitude value.
-    pub(crate) fn get_point_along_line(&self, distance_along: u32) -> Point<f64> {
+    pub fn get_point_along_line(&self, distance_along: u32) -> Point<f64> {
         let fraction = distance_along as f64 / self.len as f64;
         self.geom.line_interpolate_point(fraction).unwrap()
     }
 
     /// Gets the length of the line indicating its real dimension along the geometry of the line. The resolution used
     /// for the length value should be meter [m].
-    pub(crate) fn get_line_length(&self) -> u32 {
+    pub fn get_line_length(&self) -> u32 {
         self.len
     }
 
     /// Returns the line's unique ID.
-    pub(crate) fn get_id(&self) -> i64 {
+    pub fn get_id(&self) -> i64 {
         self.id
     }
 
     /// Returns the edge's metadata
-    pub(crate) fn get_metadata(&self) -> String {
+    pub fn get_metadata(&self) -> String {
         self.meta.to_owned()
     }
 
     /// Calculates the (smallest) distance in meters between the line and the
     /// point given by its longitude and latitude coordinates.
-    pub(crate) fn distance_to_point(&self, longitude: f64, latitude: f64) -> u32 {
+    pub fn distance_to_point(&self, longitude: f64, latitude: f64) -> u32 {
         let p1 = Point::new(longitude, latitude);
         let p2 = self.get_closest_point(p1);
         p1.haversine_distance(&p2) as u32
@@ -95,7 +109,7 @@ impl Edge {
     /// projection point along the line shape. The projection point shall be that
     /// point on the line with the smallest distance between the line and the
     /// point given by the longitude and latitude coordinates.
-    pub(crate) fn measure_along_line(&self, longitude: f64, latitude: f64) -> u32 {
+    pub fn measure_along_line(&self, longitude: f64, latitude: f64) -> u32 {
         let p1 = Point::new(longitude, latitude);
         match self.geom.line_locate_point(&p1) {
             Some(frac) => (self.len as f64 * frac) as u32,
@@ -114,7 +128,7 @@ impl Edge {
     /// starting point of the line to a point `offset` meters along the line.
     /// Otherwise, the bearing is measured from the end of the edge to a point
     /// len(edge) - `offset` meters along edge.
-    pub(crate) fn bearing_to_point(&self, offset: u32, dir: bool) -> f64 {
+    pub fn bearing_to_point(&self, offset: u32, dir: bool) -> f64 {
         let p1: Point<f64>;
         let p2: Point<f64>;
         match dir {
@@ -139,7 +153,7 @@ impl Edge {
         (b + 360.0) % 360.0
     }
 
-    pub(crate) fn get_closest_point(&self, p1: Point<f64>) -> Point<f64> {
+    pub fn get_closest_point(&self, p1: Point<f64>) -> Point<f64> {
         match self.geom.closest_point(&p1) {
             Closest::Intersection(p) => p,
             Closest::SinglePoint(p) => p,
@@ -153,6 +167,16 @@ impl Edge {
         }
     }
 
+    fn reverse_linestring(ls: &LineString) -> LineString {
+        let mut rev_coords: Vec<&Coord> = ls.coords().collect();
+        rev_coords.reverse();
+        let g = rev_coords
+            .into_iter()
+            .map(|e| e.clone())
+            .collect::<Vec<Coord>>();
+        LineString::new(g)
+    }
+
     /// Constructor that accepts pre-build geometry
     pub fn new(
         id: i64,
@@ -163,16 +187,30 @@ impl Edge {
         end_node: i64,
         len: u32,
         geom: LineString,
+        reverse: bool,
     ) -> Self {
-        Self {
-            id,
-            meta,
-            fow,
-            frc,
-            start_node,
-            end_node,
-            len,
-            geom,
+        if !reverse {
+            Self {
+                id,
+                meta,
+                fow,
+                frc,
+                start_node,
+                end_node,
+                len,
+                geom,
+            }
+        } else {
+            Self {
+                id: -id,
+                meta,
+                fow,
+                frc,
+                start_node: end_node,
+                end_node: start_node,
+                len,
+                geom: Edge::reverse_linestring(&geom),
+            }
         }
     }
     /// Constructor that build the geometry from a vector of Coords
@@ -185,16 +223,30 @@ impl Edge {
         end_node: i64,
         len: u32,
         geom: Vec<Coord>,
+        reverse: bool,
     ) -> Self {
-        Self {
-            id,
-            meta,
-            fow,
-            frc,
-            start_node,
-            end_node,
-            len,
-            geom: LineString::new(geom),
+        if !reverse {
+            Self {
+                id,
+                meta,
+                fow,
+                frc,
+                start_node,
+                end_node,
+                len,
+                geom: LineString::new(geom),
+            }
+        } else {
+            Self {
+                id: -id,
+                meta,
+                fow,
+                frc,
+                start_node: end_node,
+                end_node: start_node,
+                len,
+                geom: Edge::reverse_linestring(&LineString::new(geom)),
+            }
         }
     }
     /// Constructor that builds the geometry from WKT
@@ -207,31 +259,40 @@ impl Edge {
         end_node: i64,
         len: u32,
         geom: &str,
+        reverse: bool,
     ) -> Result<Self, OpenLrErr> {
-        match LineString::try_from_wkt_str(geom) {
-            Ok(g) => Ok(Self {
-                id,
-                meta,
-                fow,
-                frc,
-                start_node,
-                end_node,
-                len,
-                geom: g,
-            }),
-            _ => Err(OpenLrErr::InvalidEdgeWKT),
+        if !reverse {
+            match LineString::try_from_wkt_str(geom) {
+                Ok(g) => Ok(Self {
+                    id,
+                    meta,
+                    fow,
+                    frc,
+                    start_node,
+                    end_node,
+                    len,
+                    geom: g,
+                }),
+                _ => Err(OpenLrErr::InvalidEdgeWKT),
+            }
+        } else {
+            match LineString::try_from_wkt_str(geom) {
+                Ok(g) => Ok(Self {
+                    id: -id,
+                    meta,
+                    fow,
+                    frc,
+                    start_node: end_node,
+                    end_node: start_node,
+                    len,
+                    geom: Edge::reverse_linestring(&g),
+                }),
+                _ => Err(OpenLrErr::InvalidEdgeWKT),
+            }
         }
     }
     /// Constructor that builds the Edge by reversing another edge and negates the id
     pub fn new_from_reverse(peer: &Self) -> Self {
-        let mut rev_coords: Vec<&Coord> = peer.geom.coords().collect();
-        rev_coords.reverse();
-        let g = rev_coords
-            .into_iter()
-            .map(|e| e.clone())
-            .collect::<Vec<Coord>>();
-        //let g = rev_coords.iter().map(|e|*e.clone()).collect::<Vec<Coord>>();
-        let g_r = LineString::new(g);
         Self {
             id: -peer.id,
             meta: peer.meta.clone(),
@@ -240,7 +301,7 @@ impl Edge {
             start_node: peer.end_node,
             end_node: peer.start_node,
             len: peer.len,
-            geom: g_r,
+            geom: Edge::reverse_linestring(&peer.geom),
         }
     }
 }
@@ -271,7 +332,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_new() {
+    fn test_reverse_reverse() {
         let e1 = Edge::new_from_wkt(
             8548148,
             "1152964797973692416".to_owned(),
@@ -280,7 +341,9 @@ mod tests {
             1111111,
             2222222,
             199,
-            "LINESTRING(-0.42244 53.84129,-0.42241 53.84117,-0.4224 53.84109,-0.42235 53.84015,-0.42221 53.83952)").unwrap();
+            "LINESTRING(-0.42244 53.84129,-0.42241 53.84117,-0.4224 53.84109,-0.42235 53.84015,-0.42221 53.83952)",
+        true).unwrap();
+
         let e2 = Edge::new_from_reverse(&e1);
         assert_eq!(e2.id, -e1.id);
         assert_eq!(e2.meta, e1.meta);
@@ -293,5 +356,39 @@ mod tests {
         let e2_coords = e2.geom.coords().collect::<Vec<&Coord>>();
         assert_eq!(e2_coords.first(), e1_coords.last());
         assert_eq!(e2_coords.last(), e1_coords.first());
+    }
+
+    #[test]
+    fn test_reverse() {
+        let e1 = Edge::new_from_wkt(
+            8548148,
+            "1152964797973692416".to_owned(),
+            FOW::SingleCarriageway,
+            FRC::FRC5,
+            1111111,
+            2222222,
+            199,
+            "LINESTRING(-0.42244 53.84129,-0.42241 53.84117,-0.4224 53.84109,-0.42235 53.84015,-0.42221 53.83952)",
+        true).unwrap();
+
+        let e1_coords = e1.geom.coords().collect::<Vec<&Coord>>();
+        assert_eq!(e1.id, -8548148);
+        assert_eq!(e1.start_node, 2222222);
+        assert_eq!(e1.end_node, 1111111);
+        assert_eq!(e1.len, 199);
+        assert_eq!(
+            e1_coords.first().unwrap(),
+            &&Coord {
+                x: -0.42221,
+                y: 53.83952
+            }
+        );
+        assert_eq!(
+            e1_coords.last().unwrap(),
+            &&Coord {
+                x: -0.42244,
+                y: 53.84129
+            }
+        );
     }
 }

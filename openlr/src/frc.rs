@@ -29,7 +29,7 @@ impl FRC {
         }
     }
 
-    pub(crate) fn from_u8(i: u8) -> Self {
+    pub fn from_u8(i: u8) -> Self {
         match i {
             0 => FRC::FRC0,
             1 => FRC::FRC1,

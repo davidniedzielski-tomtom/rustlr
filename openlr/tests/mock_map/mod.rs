@@ -2,37 +2,60 @@ use async_trait::async_trait;
 use core::hash::Hash;
 use openlr::edge::Edge;
 use openlr::errors::OpenLrErr;
+use openlr::fow::FOW;
+use openlr::frc::FRC;
 use openlr::map::Map;
-use std::collections::HashMap;
+use std::collections::HashSet;
+use std::fs::File;
 use std::hash::Hasher;
-
-pub struct RadiusSearchKey(pub (f64, f64, u32));
-
-impl PartialEq<Self> for RadiusSearchKey {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 .0 == other.0 .0 && self.0 .1 == other.0 .1 && self.0 .2 == other.0 .2
-    }
-}
-impl Eq for RadiusSearchKey {}
-
-impl Hash for RadiusSearchKey {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        ((self.0 .0 * 10000000000.0).round() as i64).hash(state);
-        ((self.0 .1 * 10000000000.0).round() as i64).hash(state);
-        self.0 .2.hash(state)
-    }
-}
+use std::io::prelude::*;
+use std::io::BufReader;
 
 pub struct MockMap {
-    pub radius_search: HashMap<RadiusSearchKey, Vec<Edge>>,
-    pub successor_search: HashMap<(i64, i64), Vec<Edge>>,
+    edge_set: HashSet<Edge>,
 }
 impl MockMap {
     pub fn new() -> Self {
         MockMap {
-            radius_search: HashMap::new(),
-            successor_search: HashMap::new(),
+            edge_set: HashSet::<Edge>::new(),
         }
+    }
+    pub fn new_from_csv(filename: &str) -> Self {
+        let mut edge_set = HashSet::<Edge>::new();
+
+        match File::open(filename) {
+            Ok(file) => {
+                let buf_reader = BufReader::new(file);
+
+                for line in buf_reader.lines() {
+                    let l = line.unwrap();
+                    let v = l.split(":").collect::<Vec<&str>>();
+                    let flowdir = v.get(4).unwrap().parse::<u8>().unwrap();
+                    let e = Edge::new_from_wkt(
+                        v.get(0).unwrap().parse::<i64>().unwrap(),
+                        v.get(1).unwrap().trim_matches('\"').to_owned(),
+                        FOW::from_u8(v.get(2).unwrap().parse::<u8>().unwrap()),
+                        FRC::from_u8(v.get(3).unwrap().parse::<u8>().unwrap()),
+                        v.get(5).unwrap().parse::<i64>().unwrap(),
+                        v.get(6).unwrap().parse::<i64>().unwrap(),
+                        v.get(7).unwrap().parse::<u32>().unwrap(),
+                        v.get(8).unwrap().trim_matches('\"'),
+                        false,
+                    )
+                    .unwrap();
+                    if flowdir == 3 {
+                        edge_set.insert(e);
+                    } else if flowdir == 2 {
+                        edge_set.insert(Edge::new_from_reverse(&e));
+                    } else {
+                        edge_set.insert(Edge::new_from_reverse(&e));
+                        edge_set.insert(e);
+                    }
+                }
+            }
+            err => println!("Error: {:?}", err),
+        }
+        return Self { edge_set };
     }
 }
 
@@ -48,16 +71,12 @@ impl Map for MockMap {
             "radius search: lon: {}, lat: {}, radius: {}",
             lon, lat, radius
         );
-        match self.radius_search.get(&RadiusSearchKey((lon, lat, radius))) {
-            Some(v) => {
-                println!("Found");
-                Ok(v.clone())
-            }
-            _ => {
-                println!("No match");
-                Ok(Vec::<Edge>::new())
-            }
-        }
+        Ok(self
+            .edge_set
+            .iter()
+            .filter(|e| e.distance_to_point(lon, lat) <= radius)
+            .cloned()
+            .collect::<Vec<Edge>>())
     }
 
     async fn get_next_lines(
@@ -69,15 +88,44 @@ impl Map for MockMap {
             "gen next: src_edge: {}, src_node: {}",
             src_edge_id, src_node_id
         );
-        match self.successor_search.get(&(src_edge_id, src_node_id)) {
-            Some(v) => {
-                println!("Found");
-                Ok(v.clone())
-            }
-            _ => {
-                println!("No match");
-                Ok(Vec::<Edge>::new())
+        Ok(self
+            .edge_set
+            .iter()
+            .filter(|e| e.start_node == src_node_id && e.id != -src_edge_id)
+            .cloned()
+            .collect::<Vec<Edge>>())
+    }
+}
+
+#[test]
+fn test_csv() {
+    use openlr::edge::Edge;
+    use openlr::fow::FOW;
+    use openlr::frc::FRC;
+    use std::fs::File;
+    use std::io::prelude::*;
+    use std::io::BufReader;
+    match File::open("test_data/test1.csv") {
+        Ok(file) => {
+            let buf_reader = BufReader::new(file);
+
+            for line in buf_reader.lines() {
+                let l = line.unwrap();
+                let v = l.split(":").collect::<Vec<&str>>();
+                let flowdir = v.get(4).unwrap().parse::<u8>().unwrap();
+                let e = Edge::new_from_wkt(
+                    v.get(0).unwrap().parse::<i64>().unwrap(),
+                    v.get(1).unwrap().trim_matches('\"').to_owned(),
+                    FOW::from_u8(v.get(2).unwrap().parse::<u8>().unwrap()),
+                    FRC::from_u8(v.get(3).unwrap().parse::<u8>().unwrap()),
+                    v.get(5).unwrap().parse::<i64>().unwrap(),
+                    v.get(6).unwrap().parse::<i64>().unwrap(),
+                    v.get(7).unwrap().parse::<u32>().unwrap(),
+                    v.get(8).unwrap().trim_matches('\"'),
+                    false,
+                );
             }
         }
+        err => println!("Error: {:?}", err),
     }
 }

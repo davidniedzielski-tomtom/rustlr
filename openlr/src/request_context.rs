@@ -1,9 +1,6 @@
 use crate::log::{LogEntry, LogLevel};
 use crate::map::Map;
-use std::{
-    sync::{Arc, Mutex},
-    time::SystemTime,
-};
+use std::sync::{Arc, Mutex};
 
 pub struct RequestContext<'a, ParamType> {
     pub map: &'a dyn Map,
