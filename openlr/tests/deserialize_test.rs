@@ -67,7 +67,7 @@ fn test_decode3() {
     fn get_current_working_dir() -> std::io::Result<PathBuf> {
         std::env::current_dir()
     }
-    println!("{:?}",get_current_working_dir());
+    println!("{:?}", get_current_working_dir());
     let map = MockMap::new_from_csv("./test_data/test3.csv");
 
     let loc_ref = openlr::deserialize_binary("C/4bnSaa4yu5Af91ACAruQT+r/+9Kwc=").unwrap();
@@ -82,7 +82,7 @@ fn test_decode3() {
     assert!(loc.result.is_ok());
     match loc.result {
         Ok(Location::Line(l)) => {
-            assert_eq!(l.edges.len(),5);
+            assert_eq!(l.edges.len(), 5);
             assert!(l.p_off.is_none());
             assert!(l.n_off.is_none());
             assert_eq!(l.edges.get(0).unwrap().id, 13776006);

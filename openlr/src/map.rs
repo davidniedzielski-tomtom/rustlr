@@ -16,6 +16,6 @@ pub trait Map: Sync {
     async fn get_next_lines(
         &self,
         src_edge_id: i64,
-        src_node_id: i64,
+        src_meta: String,
     ) -> Result<Vec<Edge>, OpenLrErr>;
 }

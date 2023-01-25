@@ -1,27 +1,40 @@
 use async_trait::async_trait;
-use core::hash::Hash;
 use openlr::edge::Edge;
 use openlr::errors::OpenLrErr;
 use openlr::fow::FOW;
 use openlr::frc::FRC;
 use openlr::map::Map;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::fs::File;
-use std::hash::Hasher;
 use std::io::prelude::*;
 use std::io::BufReader;
 
+struct MapEntry {
+    edge: Edge,
+    start_node: i64,
+    end_node: i64,
+}
+impl MapEntry {
+    fn new(edge: Edge, start_node: i64, end_node: i64) -> Self {
+        MapEntry {
+            edge,
+            start_node,
+            end_node,
+        }
+    }
+}
+
 pub struct MockMap {
-    edge_set: HashSet<Edge>,
+    edge_map: HashMap<i64, MapEntry>,
 }
 impl MockMap {
     pub fn new() -> Self {
         MockMap {
-            edge_set: HashSet::<Edge>::new(),
+            edge_map: HashMap::<i64, MapEntry>::new(),
         }
     }
     pub fn new_from_csv(filename: &str) -> Self {
-        let mut edge_set = HashSet::<Edge>::new();
+        let mut edge_map = HashMap::<i64, MapEntry>::new();
 
         match File::open(filename) {
             Ok(file) => {
@@ -30,32 +43,23 @@ impl MockMap {
                 for line in buf_reader.lines() {
                     let l = line.unwrap();
                     let v = l.split(":").collect::<Vec<&str>>();
-                    let flowdir = v.get(4).unwrap().parse::<u8>().unwrap();
+                    let start_node = v.get(5).unwrap().parse::<i64>().unwrap();
+                    let end_node = v.get(6).unwrap().parse::<i64>().unwrap();
                     let e = Edge::new_from_wkt(
                         v.get(0).unwrap().parse::<i64>().unwrap(),
                         v.get(1).unwrap().trim_matches('\"').to_owned(),
                         FOW::from_u8(v.get(2).unwrap().parse::<u8>().unwrap()),
                         FRC::from_u8(v.get(3).unwrap().parse::<u8>().unwrap()),
-                        v.get(5).unwrap().parse::<i64>().unwrap(),
-                        v.get(6).unwrap().parse::<i64>().unwrap(),
                         v.get(7).unwrap().parse::<u32>().unwrap(),
                         v.get(8).unwrap().trim_matches('\"'),
-                        false,
                     )
                     .unwrap();
-                    if flowdir == 3 {
-                        edge_set.insert(e);
-                    } else if flowdir == 2 {
-                        edge_set.insert(Edge::new_from_reverse(&e));
-                    } else {
-                        edge_set.insert(Edge::new_from_reverse(&e));
-                        edge_set.insert(e);
-                    }
+                    edge_map.insert(e.get_id(), MapEntry::new(e, start_node, end_node));
                 }
             }
             err => println!("Error: {:?}", err),
         }
-        return Self { edge_set };
+        return Self { edge_map };
     }
 }
 
@@ -72,26 +76,28 @@ impl Map for MockMap {
             lon, lat, radius
         );
         Ok(self
-            .edge_set
-            .iter()
-            .filter(|e| e.distance_to_point(lon, lat) <= radius)
-            .cloned()
+            .edge_map
+            .values()
+            .filter(|me| me.edge.distance_to_point(lon, lat) <= radius)
+            .map(|me| me.edge.to_owned())
             .collect::<Vec<Edge>>())
     }
 
     async fn get_next_lines(
         &self,
         src_edge_id: i64,
-        src_node_id: i64,
+        src_meta: String,
     ) -> Result<Vec<Edge>, OpenLrErr> {
         println!(
-            "gen next: src_edge: {}, src_node: {}",
-            src_edge_id, src_node_id
+            "gen next: src_edge: {}, src_meta: {}",
+            src_edge_id, src_meta
         );
+        let src = self.edge_map.get(&src_edge_id).unwrap();
         Ok(self
-            .edge_set
-            .iter()
-            .filter(|e| e.start_node == src_node_id && e.id != -src_edge_id)
+            .edge_map
+            .values()
+            .filter(|me| src.end_node == me.start_node && src.start_node != me.end_node)
+            .map(|me| &me.edge)
             .cloned()
             .collect::<Vec<Edge>>())
     }
@@ -112,17 +118,13 @@ fn test_csv() {
             for line in buf_reader.lines() {
                 let l = line.unwrap();
                 let v = l.split(":").collect::<Vec<&str>>();
-                let flowdir = v.get(4).unwrap().parse::<u8>().unwrap();
                 let e = Edge::new_from_wkt(
                     v.get(0).unwrap().parse::<i64>().unwrap(),
                     v.get(1).unwrap().trim_matches('\"').to_owned(),
                     FOW::from_u8(v.get(2).unwrap().parse::<u8>().unwrap()),
                     FRC::from_u8(v.get(3).unwrap().parse::<u8>().unwrap()),
-                    v.get(5).unwrap().parse::<i64>().unwrap(),
-                    v.get(6).unwrap().parse::<i64>().unwrap(),
                     v.get(7).unwrap().parse::<u32>().unwrap(),
                     v.get(8).unwrap().trim_matches('\"'),
-                    false,
                 );
             }
         }

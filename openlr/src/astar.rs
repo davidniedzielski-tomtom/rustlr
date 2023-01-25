@@ -136,7 +136,7 @@ pub(crate) async fn find_acceptable_shortest_path<'a>(
             // leaves the cumulative path length in the DNP Goldilocks zone (not too long).
             context
                 .map
-                .get_next_lines(node.0.get_id(), node.0.get_end_node_id())
+                .get_next_lines(node.0.get_id(), node.0.get_metadata())
                 .await
                 .unwrap()
                 .into_iter()
