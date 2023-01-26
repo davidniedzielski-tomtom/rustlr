@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use itertools::Itertools;
+
 use crate::astar::find_acceptable_shortest_path;
 use crate::candidate_edge::CandidateEdge;
 use crate::decoding_parameters::DecodingParameters;
@@ -13,7 +15,7 @@ pub(crate) async fn find_location_route(
     context: &RequestContext<'_, DecodingParameters>,
     candidates: &Vec<CandidateEdge<'_>>,
     cache: &mut HashMap<(i64, i64), Option<Vec<Edge>>>,
-) -> Option<Vec<Vec<Edge>>> {
+) -> Option<Vec<Edge>> {
     let mut location_path: Vec<Vec<Edge>> = vec![];
     // As we attempt to find paths between adjacent pairs
     // of edges, we accumulate the results cheaply in
@@ -85,7 +87,21 @@ pub(crate) async fn find_location_route(
         }
     }
 
-    Some(location_path)
+    // Concatenate the subpaths into a single vector of edges, removing adjacent duplicates along the way
+    Some(
+        location_path
+            .into_iter()
+            .concat()
+            .iter()
+            .fold(vec![], |mut acc: Vec<Edge>, elem| {
+                if acc.is_empty() || acc.last().unwrap().get_id() != elem.get_id() {
+                    acc.push(elem.to_owned());
+                    acc
+                } else {
+                    acc
+                }
+            }),
+    )
 }
 
 pub fn trim<'a>(it: &mut dyn Iterator<Item = &'a Edge>, offset: u32) -> Option<(usize, u32)> {

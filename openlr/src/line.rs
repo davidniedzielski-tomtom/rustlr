@@ -33,29 +33,15 @@ impl LineLocationReference {
     // a LineLocation
     fn build_location<'a>(
         &self,
-        path: Vec<Vec<Edge>>,
+        path: Vec<Edge>,
         seg_start_offset: u32,
         seg_end_offset: u32,
     ) -> Result<LineLocation, OpenLrErr> {
-        // Concatenate the segments connecting the LRPs into a single path, removing duplicates.
-        let pathvec: Vec<Edge> =
-            path.into_iter()
-                .concat()
-                .iter()
-                .fold(vec![], |mut acc: Vec<Edge>, elem| {
-                    if acc.is_empty() || acc.last().unwrap().get_id() != elem.get_id() {
-                        acc.push(elem.to_owned());
-                        acc
-                    } else {
-                        acc
-                    }
-                });
-
         // Calculate the offsets into the path by considering both the offsets from the segment
         // start / end to the first / last LRP, as well as the pos/neg offsets from the LRP to
         // the start/end of the location.
         let mut start_index: usize = 0;
-        let mut end_index: usize = pathvec.len() - 1;
+        let mut end_index: usize = path.len() - 1;
         let mut start_offset: u32 = seg_start_offset
             + if self.pos_offset.is_some() {
                 self.pos_offset.unwrap().0
@@ -72,7 +58,7 @@ impl LineLocationReference {
         // See if the path can be trimmed at either end as a result of the offsets completely
         // spanning leading or trailing segments
         if start_offset > 0 {
-            match trim(&mut pathvec.iter(), start_offset) {
+            match trim(&mut path.iter(), start_offset) {
                 Some((index, offset)) => {
                     start_index = index;
                     start_offset = offset;
@@ -82,7 +68,7 @@ impl LineLocationReference {
         }
 
         if end_offset > 0 {
-            match trim(&mut pathvec.iter().rev(), end_offset) {
+            match trim(&mut path.iter().rev(), end_offset) {
                 Some((index, offset)) => {
                     end_index -= index;
                     end_offset = offset;
@@ -110,7 +96,7 @@ impl LineLocationReference {
             } else {
                 None
             },
-            edges: pathvec[start_index..end_index + 1].to_owned(),
+            edges: path[start_index..end_index + 1].to_owned(),
         })
     }
 
@@ -153,7 +139,7 @@ impl DecodableReference for LineLocationReference {
         }
 
         // location path is a vector of edges connecting a pair of LRPs
-        let mut location_path: Vec<Vec<Edge>> = vec![];
+        let mut location_path: Vec<Edge> = vec![];
         // Offsets from front/back of path to where we think the first/last LRP should be snapped
         let mut lrp_start_offset: u32 = 0;
         let mut lrp_end_offset: u32 = 0;
@@ -169,7 +155,7 @@ impl DecodableReference for LineLocationReference {
                 Some(lp) => {
                     // we've found a satisfactory route: record the start/end offsets based on the start/end candidate
                     location_path = lp;
-                    // unwrap is safe because path must contain at least one segment
+                    // unwrap is safe because path returned from astar contains at least the intial edge
                     lrp_start_offset = candidate_sequence.first().unwrap().offset;
                     lrp_end_offset = candidate_sequence.last().unwrap().offset;
                     break;
