@@ -85,8 +85,8 @@ impl LocationReferencePoint {
             // the real and expected bearings.  That delta is used as an index into the
             // params.bearing_score_table to obtain the raw score
             let edge_sector = (bearing / common::DEGREES_PER_SECTION) as u16;
-            let index = common::calculate_circular_delta(self.bearing_sector, edge_sector, 32)
-                .unwrap() as usize;
+            let index =
+                common::calculate_circular_delta(self.bearing_sector, edge_sector, 32) as usize;
             context.params.bearing_score_table[index] * context.params.bearing_weight
         };
 

@@ -126,14 +126,11 @@ pub fn trim<'a>(it: &mut dyn Iterator<Item = &'a Edge>, offset: u32) -> Option<(
     }
 }
 
-pub fn calculate_circular_delta(v1: u16, v2: u16, sectors: u16) -> Option<u16> {
-    if sectors % 2 != 0 || v1 >= sectors || v2 >= sectors {
-        None
+pub fn calculate_circular_delta(v1: u16, v2: u16, sectors: u16) -> u16 {
+    if v1 > v2 {
+        u16::min(v1 - v2, v2 + sectors - v1)
     } else {
-        Some(match v1.abs_diff(v2) {
-            d if d > sectors / 2 => sectors - d,
-            d => d,
-        })
+        u16::min(v2 - v1, v1 + sectors - v2)
     }
 }
 
@@ -196,30 +193,30 @@ mod tests {
     use super::calculate_circular_delta;
     #[test]
     fn test_calc_circular_delta() {
-        assert_eq!(calculate_circular_delta(360, 359, 32), None);
-        assert_eq!(calculate_circular_delta(359, 360, 32), None);
-        assert_eq!(calculate_circular_delta(359, 359, 361), None);
-        assert_eq!(calculate_circular_delta(359, 359, 360).unwrap(), 0);
-        assert_eq!(calculate_circular_delta(359, 0, 360).unwrap(), 1);
-        assert_eq!(calculate_circular_delta(0, 359, 360).unwrap(), 1);
-        assert_eq!(calculate_circular_delta(359, 1, 360).unwrap(), 2);
-        assert_eq!(calculate_circular_delta(1, 359, 360).unwrap(), 2);
-        assert_eq!(calculate_circular_delta(0, 180, 360).unwrap(), 180);
-        assert_eq!(calculate_circular_delta(180, 0, 360).unwrap(), 180);
-        assert_eq!(calculate_circular_delta(270, 90, 360).unwrap(), 180);
-        assert_eq!(calculate_circular_delta(90, 270, 360).unwrap(), 180);
+        assert_eq!(calculate_circular_delta(360, 359, 32), 1);
+        assert_eq!(calculate_circular_delta(359, 360, 32), 1);
+        assert_eq!(calculate_circular_delta(359, 359, 361), 0);
+        assert_eq!(calculate_circular_delta(359, 359, 360), 0);
+        assert_eq!(calculate_circular_delta(359, 0, 360), 1);
+        assert_eq!(calculate_circular_delta(0, 359, 360), 1);
+        assert_eq!(calculate_circular_delta(359, 1, 360), 2);
+        assert_eq!(calculate_circular_delta(1, 359, 360), 2);
+        assert_eq!(calculate_circular_delta(0, 180, 360), 180);
+        assert_eq!(calculate_circular_delta(180, 0, 360), 180);
+        assert_eq!(calculate_circular_delta(270, 90, 360), 180);
+        assert_eq!(calculate_circular_delta(90, 270, 360), 180);
 
-        assert_eq!(calculate_circular_delta(32, 31, 32), None);
-        assert_eq!(calculate_circular_delta(31, 32, 32), None);
-        assert_eq!(calculate_circular_delta(31, 31, 33), None);
-        assert_eq!(calculate_circular_delta(31, 31, 32).unwrap(), 0);
-        assert_eq!(calculate_circular_delta(31, 0, 32).unwrap(), 1);
-        assert_eq!(calculate_circular_delta(0, 31, 32).unwrap(), 1);
-        assert_eq!(calculate_circular_delta(31, 1, 32).unwrap(), 2);
-        assert_eq!(calculate_circular_delta(1, 31, 32).unwrap(), 2);
-        assert_eq!(calculate_circular_delta(0, 16, 32).unwrap(), 16);
-        assert_eq!(calculate_circular_delta(16, 0, 32).unwrap(), 16);
-        assert_eq!(calculate_circular_delta(24, 8, 32).unwrap(), 16);
-        assert_eq!(calculate_circular_delta(8, 24, 32).unwrap(), 16);
+        assert_eq!(calculate_circular_delta(32, 31, 32), 1);
+        assert_eq!(calculate_circular_delta(31, 32, 32), 1);
+        assert_eq!(calculate_circular_delta(31, 31, 33), 0);
+        assert_eq!(calculate_circular_delta(31, 31, 32), 0);
+        assert_eq!(calculate_circular_delta(31, 0, 32), 1);
+        assert_eq!(calculate_circular_delta(0, 31, 32), 1);
+        assert_eq!(calculate_circular_delta(31, 1, 32), 2);
+        assert_eq!(calculate_circular_delta(1, 31, 32), 2);
+        assert_eq!(calculate_circular_delta(0, 16, 32), 16);
+        assert_eq!(calculate_circular_delta(16, 0, 32), 16);
+        assert_eq!(calculate_circular_delta(24, 8, 32), 16);
+        assert_eq!(calculate_circular_delta(8, 24, 32), 16);
     }
 }
