@@ -14,13 +14,13 @@ fn test_decode1() {
     let map = MockMap::new_from_csv("test_data/test1.csv");
 
     let loc_ref = openlr::deserialize_binary("C/+zGCZJgyuvBAAh/x8rHw==").unwrap();
-    let loc = block_on(openlr::decode(
-        1,
-        &loc_ref,
-        &map,
-        &DecodingParameters::default(),
-        LogLevel::Trace,
-    ));
+    let mut params = DecodingParameters::default();
+    params.bearing_weight = 0.35;
+    params.fow_weight = 0.2;
+    params.frc_weight = 0.1;
+    params.distance_weight = 0.35;
+    let loc = block_on(openlr::decode(1, &loc_ref, &map, &params, LogLevel::Debug));
+    println!("{:?}", loc);
     assert!(loc.result.is_ok());
     match loc.result {
         Ok(Location::Line(l)) => {
@@ -76,7 +76,7 @@ fn test_decode3() {
         &loc_ref,
         &map,
         &DecodingParameters::default(),
-        LogLevel::Trace,
+        LogLevel::Debug,
     ));
     println!("{:?}", loc);
     assert!(loc.result.is_ok());

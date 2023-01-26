@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::binary_header::BinaryHeader;
 use crate::candidate_edge::CandidateEdge;
-use crate::common::{build_lrp, calculate_offset, find_location_route, trim};
+use crate::common::{calculate_offset, find_location_route, get_next_coordinate, int2deg, trim};
 use crate::decodable_reference::DecodableReference;
 use crate::decoding_parameters::DecodingParameters;
 use crate::deserializable_reference::DeserializableReference;
@@ -113,6 +113,28 @@ impl LineLocationReference {
             edges: pathvec[start_index..end_index + 1].to_owned(),
         })
     }
+
+    pub fn build_lrp(
+        ba: &[u8],
+        prev: Option<&LocationReferencePoint>,
+        index: usize,
+        last: bool,
+    ) -> LocationReferencePoint {
+        let offset = if prev.is_none() { 6 } else { 4 };
+        LocationReferencePoint::new_from_byte_array(
+            match prev {
+                None => int2deg(ba[0], ba[1], ba[2]),
+                Some(lrp) => get_next_coordinate(ba[0], ba[1], lrp.longitude),
+            },
+            match prev {
+                None => int2deg(ba[3], ba[4], ba[5]),
+                Some(lrp) => get_next_coordinate(ba[2], ba[3], lrp.latitude),
+            },
+            &ba[offset..],
+            index,
+            last,
+        )
+    }
 }
 
 #[async_trait]
@@ -181,11 +203,16 @@ impl DeserializableReference for LineLocationReference {
         let mut offset = 10;
 
         // Parse the first LocationReferencePoint
-        lrps.push(build_lrp(&bytes[1..offset], None, 0, false));
+        lrps.push(LineLocationReference::build_lrp(
+            &bytes[1..offset],
+            None,
+            0,
+            false,
+        ));
 
         // Parse the intermediate LRPSs
         for i in 1..num_lrps - 1 {
-            lrps.push(build_lrp(
+            lrps.push(LineLocationReference::build_lrp(
                 &bytes[offset..offset + 7],
                 Some(&lrps[i - 1]),
                 i,
@@ -195,7 +222,7 @@ impl DeserializableReference for LineLocationReference {
         }
 
         // Parse the last LRP
-        lrps.push(build_lrp(
+        lrps.push(LineLocationReference::build_lrp(
             &bytes[offset..offset + 6],
             Some(&lrps[num_lrps - 2]),
             num_lrps - 1,
@@ -234,7 +261,7 @@ impl DeserializableReference for LineLocationReference {
             None
         };
 
-        // Return the LRP
+        // Return the LocationReference
         Ok(LineLocationReference {
             header,
             lrps,

@@ -4,12 +4,9 @@ use crate::astar::find_acceptable_shortest_path;
 use crate::candidate_edge::CandidateEdge;
 use crate::decoding_parameters::DecodingParameters;
 use crate::edge::Edge;
-use crate::fow::FOW;
-use crate::frc::FRC;
-use crate::location_reference_point::LocationReferencePoint;
 use crate::request_context::RequestContext;
 
-pub const DISTANCE_PER_SECTION: u32 = 15_000 / 256;
+pub const DISTANCE_PER_SECTION: f64 = 15_000.0 / 256.0;
 pub const DEGREES_PER_SECTION: f64 = 360.0 / 32.0;
 
 pub(crate) async fn find_location_route(
@@ -50,6 +47,13 @@ pub(crate) async fn find_location_route(
             }
             _ => match find_acceptable_shortest_path(&pair[0], &pair[1], context).await {
                 Ok(sp) => {
+                    context.debug(|| {
+                        format!(
+                            "Path found between edges {:?}: {:?}",
+                            cache_key,
+                            sp.iter().map(|e| e.id).collect::<Vec<i64>>()
+                        )
+                    });
                     cache_work.push((location_path.len(), cache_key.0, cache_key.1));
                     location_path.push(sp);
                 }
@@ -95,40 +99,6 @@ pub fn trim<'a>(it: &mut dyn Iterator<Item = &'a Edge>, offset: u32) -> Option<(
     }
 }
 
-pub fn build_lrp(
-    ba: &[u8],
-    prev: Option<&LocationReferencePoint>,
-    index: usize,
-    last: bool,
-) -> LocationReferencePoint {
-    let offset = if prev.is_none() { 6 } else { 4 };
-    LocationReferencePoint {
-        longitude: match prev {
-            None => int2deg(ba[0], ba[1], ba[2]),
-            Some(lrp) => get_next_coordinate(ba[0], ba[1], lrp.longitude),
-        },
-        latitude: match prev {
-            None => int2deg(ba[3], ba[4], ba[5]),
-            Some(lrp) => get_next_coordinate(ba[2], ba[3], lrp.latitude),
-        },
-        frc: FRC::from_u8((ba[offset] >> 3) & 0b00000111),
-        fow: FOW::from_u8(ba[offset] & 0b00000111),
-        lowest_frc_to_next_point: if last {
-            None
-        } else {
-            Some(FRC::from_u8(ba[offset + 1] >> 5))
-        },
-        bearing: int2bearing(ba[offset + 1] & 0b00011111),
-        dnp: if last {
-            None
-        } else {
-            Some(distance_to_next_lrp(ba[offset + 2]))
-        },
-        index,
-        is_last: last,
-    }
-}
-
 pub fn calculate_circular_delta(v1: u16, v2: u16, sectors: u16) -> Option<u16> {
     if sectors % 2 != 0 || v1 >= sectors || v2 >= sectors {
         None
@@ -153,8 +123,8 @@ pub fn signum(i: f64) -> f64 {
 pub fn distance_to_next_lrp(d: u8) -> (u32, u32) {
     let du32 = d as u32;
     (
-        du32 * DISTANCE_PER_SECTION,
-        (du32 + 1) * DISTANCE_PER_SECTION,
+        (du32 as f64 * DISTANCE_PER_SECTION).floor() as u32,
+        ((du32 + 1) as f64 * DISTANCE_PER_SECTION).floor() as u32,
     )
 }
 
