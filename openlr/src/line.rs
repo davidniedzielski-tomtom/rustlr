@@ -154,6 +154,7 @@ impl DecodableReference for LineLocationReference {
 
         // location path is a vector of edges connecting a pair of LRPs
         let mut location_path: Vec<Vec<Edge>> = vec![];
+        // Offsets from front/back of path to where we think the first/last LRP should be snapped
         let mut lrp_start_offset: u32 = 0;
         let mut lrp_end_offset: u32 = 0;
 
@@ -168,8 +169,9 @@ impl DecodableReference for LineLocationReference {
                 Some(lp) => {
                     // we've found a satisfactory route: record the start/end offsets based on the start/end candidate
                     location_path = lp;
-                    lrp_start_offset = candidate_sequence[0].offset;
-                    lrp_end_offset = candidate_sequence[candidate_sequence.len() - 1].offset;
+                    // unwrap is safe because path must contain at least one segment
+                    lrp_start_offset = candidate_sequence.first().unwrap().offset;
+                    lrp_end_offset = candidate_sequence.last().unwrap().offset;
                     break;
                 }
                 _ => (),

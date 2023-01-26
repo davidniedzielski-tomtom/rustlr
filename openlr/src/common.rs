@@ -15,6 +15,14 @@ pub(crate) async fn find_location_route(
     cache: &mut HashMap<(i64, i64), Option<Vec<Edge>>>,
 ) -> Option<Vec<Vec<Edge>>> {
     let mut location_path: Vec<Vec<Edge>> = vec![];
+    // As we attempt to find paths between adjacent pairs
+    // of edges, we accumulate the results cheaply in
+    // this Vec.  If we can find a path spanning the entire
+    // location, we make no updates to the caller's cache,
+    // because we won't be called again with another sequence
+    // of edges.  Otherwise, we (expensively) clone results
+    // in the work cache into the caller's cache, because
+    // if we're called again, we can reuse previous search results.
     let mut cache_work: Vec<(usize, i64, i64)> = vec![];
 
     // for each consecutive pair of candidate edges, see if we can find an acceptable route linking the corresponding LRPs.
@@ -64,6 +72,9 @@ pub(crate) async fn find_location_route(
                             cache_key, openlr_err
                         )
                     });
+                    // We failed to find a path across *all* adjacent pairs, but we may have
+                    // successfully found subpaths.  Save our work into the caller's cache to
+                    // be reused on subsequent calls.
                     for (index, src_id, dest_id) in cache_work {
                         cache.insert((src_id, dest_id), Some(location_path[index].clone()));
                     }

@@ -121,6 +121,7 @@ pub(crate) async fn find_acceptable_shortest_path<'a>(
                 )
             });
 
+            // We've arrived at the destination edge.  Walk the chain of parents back to the src
             if node.0.get_id() == dst_id {
                 let path = reverse_path(&parents, |&(p, _)| p, index);
                 return Ok(path.into_iter().map(|ew| ew.0).collect());
@@ -152,6 +153,8 @@ pub(crate) async fn find_acceptable_shortest_path<'a>(
         };
 
         for (successor, move_cost) in successors {
+            // the new cost is the distance we've traveled to arrive at the start of this
+            // successor, plus the distance from the successor's start to end
             let new_cost = cost + move_cost;
 
             // Only consider this successor if the path length hasn't exceeded the LRP DNP tolerance

@@ -141,7 +141,7 @@ impl LocationReferencePoint {
         edge: &Edge,
         context: &RequestContext<'_, DecodingParameters>,
     ) -> u32 {
-        // get the distance from start of line to the projection of this LRP
+        // get the distance from start of edge to the projection of this LRP
         let mut d = edge.measure_along_line(self.longitude, self.latitude);
 
         // if this is the last LRP, the offset is we're interested in the the distance
@@ -157,27 +157,34 @@ impl LocationReferencePoint {
             || ((d as f64 / edge.get_line_length() as f64)
                 > context.params.relative_snapping_threshold)
         {
+            context.debug(|| {
+                format!(
+                    "projection of LRP {} snapped to interior of edge {} at offset ({}m)",
+                    self.index,
+                    edge.get_id(),
+                    d
+                )
+            });
             d
         } else {
             if self.is_last {
                 context.debug(|| {
                     format!(
-                    "projection of LRP {} onto edge {} snapped to end node due to proximity ({}m)",
+                    "projection of last LRP {} onto edge {} snapped to end node due to proximity ({}m)",
                     self.index,
                     edge.get_id(),
                     d
                 )
                 });
-                0
             } else {
                 context.debug(|| format!(
-                    "projection of LRP {} onto edge {} snapped to start node due to proximity ({}m)", 
+                    "projection of first or intermediate LRP {} onto edge {} snapped to start node due to proximity ({}m)", 
                     self.index,
                     edge.get_id(),
                     d
                 ));
-                0
             }
+            0
         }
     }
 
