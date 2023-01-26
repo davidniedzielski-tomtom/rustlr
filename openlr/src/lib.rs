@@ -27,7 +27,6 @@ use std::time::SystemTime;
 
 use crate::decodable_reference::DecodableReference;
 use crate::decoding_parameters::DecodingParameters;
-use crate::encodable_location::EncodableLocation;
 use crate::encoding_parameters::EncodingParameters;
 use crate::errors::OpenLrErr;
 use crate::location::Location;

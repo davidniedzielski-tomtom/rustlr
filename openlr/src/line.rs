@@ -17,8 +17,13 @@ use crate::request_context::RequestContext;
 use crate::route_generator::RouteGenerator;
 use crate::serializable_reference::SerializableReference;
 use async_trait::async_trait;
-use itertools::Itertools;
 use serde::Serialize;
+
+//--------------------------------------------------------------------//
+//                                                                    //
+// OpenLR Line                                                        //
+//                                                                    //
+//--------------------------------------------------------------------//
 
 #[derive(Debug)]
 pub struct LineLocationReference {
@@ -31,7 +36,7 @@ pub struct LineLocationReference {
 impl LineLocationReference {
     // Given a sequence of Edges that connect the LRPs in a LocRef, generate
     // a LineLocation
-    fn build_location<'a>(
+    fn build_location(
         &self,
         path: Vec<Edge>,
         seg_start_offset: u32,

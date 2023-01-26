@@ -2,8 +2,8 @@ use crate::errors::OpenLrErr;
 use crate::fow::FOW;
 use crate::frc::FRC;
 use geo::{
-    Bearing, Closest, ClosestPoint, Coord, CoordsIter, Geometry, HaversineDestination,
-    HaversineDistance, LineInterpolatePoint, LineLocatePoint, LineString, Point,
+    Bearing, Closest, ClosestPoint, Coord, CoordsIter, HaversineDistance, LineInterpolatePoint,
+    LineLocatePoint, LineString, Point,
 };
 use log::warn;
 use serde::ser::SerializeStruct;
