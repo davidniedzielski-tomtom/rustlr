@@ -18,7 +18,7 @@ pub const DEGREES_PER_SECTION: f64 = 360.0 / 32.0;
 pub(crate) async fn find_route_across_lrps<'a>(
     lrps: &'a Vec<LocationReferencePoint>,
     context: &'a RequestContext<'a, DecodingParameters>,
-) -> Result<(Vec<Edge>, u32,u32), OpenLrErr> {
+) -> Result<(Vec<Edge>, u32, u32), OpenLrErr> {
     let lrp_candidates = find_candidates(lrps, context).await;
 
     // the route generator creates pairs of candidate endpoints in the optimal order
@@ -43,7 +43,11 @@ pub(crate) async fn find_route_across_lrps<'a>(
                         lp.iter().map(|e| e.get_id()).collect::<Vec<i64>>()
                     )
                 });
-                return Ok((lp, candidate_sequence.first().unwrap().offset, candidate_sequence.last().unwrap().offset));
+                return Ok((
+                    lp,
+                    candidate_sequence.first().unwrap().offset,
+                    candidate_sequence.last().unwrap().offset,
+                ));
             }
             _ => {
                 context.debug(|| {

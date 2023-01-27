@@ -27,6 +27,7 @@ pub struct RouteGenerator<'a> {
 impl<'a> RouteGenerator<'a> {
     pub fn new(candidates: Vec<Vec<CandidateEdge<'a>>>) -> Self {
         let mut heap = PriorityQueue::new();
+        // initialize the queue with the first candidate for each lrp (best option)
         let i = candidates.iter().fold((vec![], 0f64), |mut acc, e| {
             acc.0.push(0usize);
             (acc.0, acc.1 + e.first().unwrap().score)

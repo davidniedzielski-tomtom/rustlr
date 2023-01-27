@@ -136,11 +136,10 @@ impl DecodableReference for LineLocationReference {
                 // we've found a satisfactory route: record the start/end offsets based on the start/end candidate
                 // unwrap is safe because star will either fail or else return a path with at least one edge
                 Ok(Location::Line(
-                    self.build_location(lp, pos_offset, neg_offset)
-                        .unwrap()
+                    self.build_location(lp, pos_offset, neg_offset).unwrap(),
                 ))
-            },
-            Err(e) => Err(e)
+            }
+            Err(e) => Err(e),
         }
     }
 }
