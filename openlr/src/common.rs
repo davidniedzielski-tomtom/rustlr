@@ -1,15 +1,41 @@
 use std::collections::HashMap;
 
+use geo::Coord;
 use itertools::Itertools;
 
 use crate::astar::find_acceptable_shortest_path;
 use crate::candidate_edge::CandidateEdge;
 use crate::decoding_parameters::DecodingParameters;
 use crate::edge::Edge;
+use crate::location_reference_point::LocationReferencePoint;
 use crate::request_context::RequestContext;
 
 pub const DISTANCE_PER_SECTION: f64 = 15_000.0 / 256.0;
 pub const DEGREES_PER_SECTION: f64 = 360.0 / 32.0;
+
+pub(crate) async fn find_candidates<'a>(
+    lrps: &'a Vec<LocationReferencePoint>,
+    context: &'a RequestContext<'a, DecodingParameters>,
+) -> Vec<Vec<CandidateEdge<'a>>> {
+    // get a vector of candidate edges for each LRP in the LRP vector
+    context
+        .map
+        .get_lines_near_coordinates(
+            lrps.iter()
+                .map(|lrp| Coord {
+                    x: lrp.longitude,
+                    y: lrp.latitude,
+                })
+                .collect::<Vec<Coord>>(),
+            context.params.search_radius,
+        )
+        .await
+        .unwrap()
+        .into_iter()
+        .enumerate()
+        .map(|(index, v)| lrps[index].find_candidate_edges(v, context).unwrap())
+        .collect::<Vec<Vec<CandidateEdge>>>()
+}
 
 pub(crate) async fn find_location_route(
     context: &RequestContext<'_, DecodingParameters>,

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::binary_header::BinaryHeader;
 use crate::candidate_edge::CandidateEdge;
-use crate::common::{calculate_offset, find_location_route, get_next_coordinate, int2deg, trim};
+use crate::common::{calculate_offset, find_location_route, get_next_coordinate, int2deg, trim, find_candidates};
 use crate::decodable_reference::DecodableReference;
 use crate::decoding_parameters::DecodingParameters;
 use crate::deserializable_reference::DeserializableReference;
@@ -136,62 +136,48 @@ impl DecodableReference for LineLocationReference {
         &self,
         context: &RequestContext<DecodingParameters>,
     ) -> Result<Location, OpenLrErr> {
-        // lrp_candidates is a vector of Candidate edges, one for each LRP
-        let lrp_candidates: Vec<Vec<CandidateEdge>> = context
-            .map
-            .get_lines_near_coordinates(
-                self.lrps
-                    .iter()
-                    .map(|lrp| Coord {
-                        x: lrp.longitude,
-                        y: lrp.latitude,
-                    })
-                    .collect::<Vec<Coord>>(),
-                context.params.search_radius,
-            )
-            .await
-            .unwrap()
-            .into_iter()
-            .enumerate()
-            .map(|(index, v)| self.lrps[index].find_candidate_edges(v, context).unwrap())
-            .collect::<Vec<Vec<CandidateEdge>>>();
-
-        // location path is a vector of edges connecting a pair of LRPs
-        let mut location_path: Vec<Edge> = vec![];
-        // Offsets from front/back of path to where we think the first/last LRP should be snapped
-        let mut lrp_start_offset: u32 = 0;
-        let mut lrp_end_offset: u32 = 0;
+        let lrp_candidates = find_candidates(&self.lrps, context).await;
 
         // the route generator creates pairs of candidate endpoints in the optimal order
         let rg = RouteGenerator::new(lrp_candidates);
-        // some subpaths may be repeated, so we cache subpaths in this hash map
+        // some subpaths may be repeated across generatied sequences, so we cache subpaths in this hash map
         let mut path_cache: HashMap<(i64, i64), Option<Vec<Edge>>> = HashMap::new();
 
         // generate a fixed number of candidate sequences, and for each, attempt to connect LRP candidate edges
         for candidate_sequence in rg.into_iter().take(context.params.max_routing_attempts) {
+            println!(
+                "Attempting to find path for location using candidate sequence: {:?}",
+                candidate_sequence
+                    .iter()
+                    .map(|c| c.candidate.get_id())
+                    .collect::<Vec<i64>>()
+            );
             match find_location_route(context, &candidate_sequence, &mut path_cache).await {
                 Some(lp) => {
                     // we've found a satisfactory route: record the start/end offsets based on the start/end candidate
-                    location_path = lp;
-                    // unwrap is safe because path returned from astar contains at least the intial edge
-                    lrp_start_offset = candidate_sequence.first().unwrap().offset;
-                    lrp_end_offset = candidate_sequence.last().unwrap().offset;
-                    break;
+                    // unwrap is safe because star will either fail or else return a path with at least one edge
+                    let lrp_start_offset = candidate_sequence.first().unwrap().offset;
+                    let lrp_end_offset = candidate_sequence.last().unwrap().offset;
+                    context.debug(|| {
+                        format!(
+                            "Path found: {:?}",
+                            lp.iter().map(|e| e.get_id()).collect::<Vec<i64>>()
+                        )
+                    });
+                    return Ok(Location::Line(
+                        self.build_location(lp, lrp_start_offset, lrp_end_offset)
+                            .unwrap(),
+                    ));
                 }
-                _ => (),
+                _ => println!(
+                    "Unable to find path for candidate sequence: {:?}",
+                    candidate_sequence.iter().map(|c| c.candidate.get_id())
+                ),
             }
         }
 
-        // check reason for loop termination
-        if location_path.is_empty() {
-            context.info(|| format!("Unable to find path for location reference {:?}", self));
-            Err(OpenLrErr::NoPathFound)
-        } else {
-            Ok(Location::Line(
-                self.build_location(location_path, lrp_start_offset, lrp_end_offset)
-                    .unwrap(),
-            ))
-        }
+        context.info(|| format!("Unable to find path for location reference {:?}", self));
+        Err(OpenLrErr::NoPathFound)
     }
 }
 
