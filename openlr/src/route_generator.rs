@@ -20,14 +20,14 @@ impl Ord for FWrap {
 }
 
 pub struct RouteGenerator<'a> {
-    candidates: Vec<Vec<CandidateEdge<'a>>>,
+    candidates: &'a Vec<Vec<CandidateEdge<'a>>>,
     heap: PriorityQueue<Vec<usize>, FWrap>,
 }
 
 impl<'a> RouteGenerator<'a> {
-    pub fn new(candidates: Vec<Vec<CandidateEdge<'a>>>) -> Self {
+    pub fn new(candidates: &'a Vec<Vec<CandidateEdge<'a>>>) -> Self {
         let mut heap = PriorityQueue::new();
-        // initialize the queue with the first candidate for each lrp (best option)
+        // initialize the queue with the first candidate for each lrp (the best route)
         let i = candidates.iter().fold((vec![], 0f64), |mut acc, e| {
             acc.0.push(0usize);
             (acc.0, acc.1 + e.first().unwrap().score)
@@ -39,7 +39,7 @@ impl<'a> RouteGenerator<'a> {
 }
 
 impl<'a> Iterator for RouteGenerator<'a> {
-    type Item = Vec<CandidateEdge<'a>>;
+    type Item = Vec<usize>;
 
     fn next(&mut self) -> Option<Self::Item> {
         // Return the next best vector of candidate indices whose connected path
@@ -69,13 +69,7 @@ impl<'a> Iterator for RouteGenerator<'a> {
 
                 // Return this leading candidate after first resolving the indices to the candidate segments they
                 // represent.
-                Some(
-                    indices
-                        .iter()
-                        .enumerate()
-                        .map(|(k, j)| self.candidates[k][*j].clone())
-                        .collect(),
-                )
+                Some(indices)
             }
             _ => None,
         }

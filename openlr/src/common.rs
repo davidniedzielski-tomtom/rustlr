@@ -22,12 +22,23 @@ pub(crate) async fn find_route_across_lrps<'a>(
     let lrp_candidates = find_candidates(lrps, context).await;
 
     // the route generator creates pairs of candidate endpoints in the optimal order
-    let rg = RouteGenerator::new(lrp_candidates);
+    let rg = RouteGenerator::new(&lrp_candidates);
     // some subpaths may be repeated across generatied sequences, so we cache subpaths in this hash map
     let mut path_cache: HashMap<(i64, i64), Option<Vec<Edge>>> = HashMap::new();
 
     // generate a fixed number of candidate sequences, and for each, attempt to connect LRP candidate edges
-    for candidate_sequence in rg.into_iter().take(context.params.max_routing_attempts) {
+    for candidate_indices in rg.into_iter().take(context.params.max_routing_attempts) {
+        let candidate_sequence = candidate_indices
+            .iter()
+            .enumerate()
+            .map(|(lrp_index, candidate_index)| {
+                lrp_candidates
+                    .get(lrp_index)
+                    .unwrap()
+                    .get(*candidate_index)
+                    .unwrap()
+            })
+            .collect::<Vec<&CandidateEdge>>();
         println!(
             "Attempting to find path for location using candidate sequence: {:?}",
             candidate_sequence
@@ -91,7 +102,7 @@ pub(crate) async fn find_candidates<'a>(
 
 pub(crate) async fn find_location_route(
     context: &RequestContext<'_, DecodingParameters>,
-    candidates: &Vec<CandidateEdge<'_>>,
+    candidates: &Vec<&CandidateEdge<'_>>,
     cache: &mut HashMap<(i64, i64), Option<Vec<Edge>>>,
 ) -> Option<Vec<Edge>> {
     let mut location_path: Vec<Vec<Edge>> = vec![];
