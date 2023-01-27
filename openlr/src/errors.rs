@@ -46,6 +46,8 @@ pub enum OpenLrErr {
     PathLengthTooShort(usize, u16, usize, u16),
     #[error("No subpath connecting LRPs {0} and {1} found")]
     NoSubPathFound(usize, usize),
+    #[error("No edges near LRP {0} could be found")]
+    NoEdgesNearLRP(usize),
     #[error("No candidates found for LRP {0}")]
     NoCandidatesFoundForLRP(usize),
     #[error("Unable to parse base64 string: {0}. Reason: {1}")]

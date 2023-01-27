@@ -196,10 +196,10 @@ impl LocationReferencePoint {
         context: &RequestContext<'_, DecodingParameters>,
     ) -> Result<Vec<CandidateEdge<'a>>, OpenLrErr> {
         if candidate_edges.is_empty() {
-            return Err(OpenLrErr::NoCandidatesFoundForLRP(self.index));
+            return Err(OpenLrErr::NoEdgesNearLRP(self.index));
         }
 
-        // find an unordered set of candidates that meet our requirements
+        // given a vector of edges near this LRP, return a vector of candidates edges
         let mut candidates: Vec<CandidateEdge> = candidate_edges
             .into_iter()
             .map(|e: Edge| {
