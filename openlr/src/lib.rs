@@ -91,10 +91,10 @@ pub fn deserialize_binary(bin: &str) -> Result<LocationReference, OpenLrErr> {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use super::*;
 
     #[test]
-    fn it_works() {
-        assert_eq!(4, 4);
-    }
+    fn test_clone() {}
 }

@@ -1,4 +1,5 @@
 use crate::candidate_edge::CandidateEdge;
+use crate::common;
 use crate::common::{calculate_circular_delta, distance_to_next_lrp, int2bearing};
 use crate::decoding_parameters::DecodingParameters;
 use crate::edge::Edge;
@@ -6,7 +7,6 @@ use crate::errors::OpenLrErr;
 use crate::fow::FOW;
 use crate::frc::FRC;
 use crate::request_context::RequestContext;
-use crate::common;
 use serde::Serialize;
 use std::cmp::Ordering;
 
@@ -190,15 +190,17 @@ impl LocationReferencePoint {
 
     // Query the supplied MapDatabase to find all edges that are a candidate for this LRP
     // given the constraints in the supplied derefercing parameter set
-    pub(crate) async fn find_candidate_edges<'a>(
+    pub(crate) fn find_candidate_edges<'a>(
         &'a self,
+        candidate_edges: Vec<Edge>,
         context: &RequestContext<'_, DecodingParameters>,
     ) -> Result<Vec<CandidateEdge<'a>>, OpenLrErr> {
+        if candidate_edges.is_empty() {
+            return Err(OpenLrErr::NoCandidatesFoundForLRP(self.index));
+        }
+
         // find an unordered set of candidates that meet our requirements
-        let mut candidates: Vec<CandidateEdge> = context
-            .map
-            .get_lines_near_coordinate(self.longitude, self.latitude, context.params.search_radius)
-            .await?
+        let mut candidates: Vec<CandidateEdge> = candidate_edges
             .into_iter()
             .map(|e: Edge| {
                 let score = self.score_candidate_edge(&e, context);

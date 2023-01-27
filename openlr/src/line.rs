@@ -17,6 +17,7 @@ use crate::request_context::RequestContext;
 use crate::route_generator::RouteGenerator;
 use crate::serializable_reference::SerializableReference;
 use async_trait::async_trait;
+use geo::Coord;
 use serde::Serialize;
 
 //--------------------------------------------------------------------//
@@ -136,12 +137,24 @@ impl DecodableReference for LineLocationReference {
         context: &RequestContext<DecodingParameters>,
     ) -> Result<Location, OpenLrErr> {
         // lrp_candidates is a vector of Candidate edges, one for each LRP
-        let mut lrp_candidates: Vec<Vec<CandidateEdge>> = vec![];
-
-        // find potential edge matches for each LRP
-        for lrp in &self.lrps {
-            lrp_candidates.push(lrp.find_candidate_edges(context).await?);
-        }
+        let lrp_candidates: Vec<Vec<CandidateEdge>> = context
+            .map
+            .get_lines_near_coordinates(
+                self.lrps
+                    .iter()
+                    .map(|lrp| Coord {
+                        x: lrp.longitude,
+                        y: lrp.latitude,
+                    })
+                    .collect::<Vec<Coord>>(),
+                context.params.search_radius,
+            )
+            .await
+            .unwrap()
+            .into_iter()
+            .enumerate()
+            .map(|(index, v)| self.lrps[index].find_candidate_edges(v, context).unwrap())
+            .collect::<Vec<Vec<CandidateEdge>>>();
 
         // location path is a vector of edges connecting a pair of LRPs
         let mut location_path: Vec<Edge> = vec![];

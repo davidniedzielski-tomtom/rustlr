@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use geo::Coord;
 use openlr::edge::Edge;
 use openlr::errors::OpenLrErr;
 use openlr::fow::FOW;
@@ -65,22 +66,22 @@ impl MockMap {
 
 #[async_trait]
 impl Map for MockMap {
-    async fn get_lines_near_coordinate(
+    async fn get_lines_near_coordinates(
         &self,
-        lon: f64,
-        lat: f64,
+        points: Vec<Coord>,
         radius: u32,
-    ) -> Result<Vec<Edge>, OpenLrErr> {
-        println!(
-            "radius search: lon: {}, lat: {}, radius: {}",
-            lon, lat, radius
-        );
-        Ok(self
-            .edge_map
-            .values()
-            .filter(|me| me.edge.distance_to_point(lon, lat) <= radius)
-            .map(|me| me.edge.to_owned())
-            .collect::<Vec<Edge>>())
+    ) -> Result<Vec<Vec<Edge>>, OpenLrErr> {
+        println!("radius search: points: {:?}, radius: {}", points, radius);
+        Ok(points
+            .iter()
+            .map(|c| {
+                self.edge_map
+                    .values()
+                    .filter(|me| me.edge.distance_to_point(c.x, c.y) <= radius)
+                    .map(|me| me.edge.to_owned())
+                    .collect::<Vec<Edge>>()
+            })
+            .collect::<Vec<Vec<Edge>>>())
     }
 
     async fn get_next_lines(
@@ -89,7 +90,7 @@ impl Map for MockMap {
         src_meta: String,
     ) -> Result<Vec<Edge>, OpenLrErr> {
         println!(
-            "gen next: src_edge: {}, src_meta: {}",
+            "next_line: src_edge: {}, src_meta: {}",
             src_edge_id, src_meta
         );
         let src = self.edge_map.get(&src_edge_id).unwrap();

@@ -119,8 +119,8 @@ fn test_decode4() {
     match loc.result {
         Ok(Location::Line(l)) => {
             assert_eq!(l.edges.len(), 4);
-            assert_eq!(l.p_off,Some((31,64)));
-            assert_eq!(l.n_off,Some((15,19)));
+            assert_eq!(l.p_off, Some((31, 64)));
+            assert_eq!(l.n_off, Some((15, 19)));
             assert_eq!(l.edges.get(0).unwrap().id, 11384678);
             assert_eq!(l.edges.get(1).unwrap().id, 3551999);
             assert_eq!(l.edges.get(2).unwrap().id, 12007589);
