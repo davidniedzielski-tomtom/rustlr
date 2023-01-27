@@ -7,11 +7,59 @@ use crate::astar::find_acceptable_shortest_path;
 use crate::candidate_edge::CandidateEdge;
 use crate::decoding_parameters::DecodingParameters;
 use crate::edge::Edge;
+use crate::errors::OpenLrErr;
 use crate::location_reference_point::LocationReferencePoint;
 use crate::request_context::RequestContext;
+use crate::route_generator::RouteGenerator;
 
 pub const DISTANCE_PER_SECTION: f64 = 15_000.0 / 256.0;
 pub const DEGREES_PER_SECTION: f64 = 360.0 / 32.0;
+
+pub(crate) async fn find_route_across_lrps<'a>(
+    lrps: &'a Vec<LocationReferencePoint>,
+    context: &'a RequestContext<'a, DecodingParameters>,
+) -> Result<(Vec<Edge>, u32,u32), OpenLrErr> {
+    let lrp_candidates = find_candidates(lrps, context).await;
+
+    // the route generator creates pairs of candidate endpoints in the optimal order
+    let rg = RouteGenerator::new(lrp_candidates);
+    // some subpaths may be repeated across generatied sequences, so we cache subpaths in this hash map
+    let mut path_cache: HashMap<(i64, i64), Option<Vec<Edge>>> = HashMap::new();
+
+    // generate a fixed number of candidate sequences, and for each, attempt to connect LRP candidate edges
+    for candidate_sequence in rg.into_iter().take(context.params.max_routing_attempts) {
+        println!(
+            "Attempting to find path for location using candidate sequence: {:?}",
+            candidate_sequence
+                .iter()
+                .map(|c| c.candidate.get_id())
+                .collect::<Vec<i64>>()
+        );
+        match find_location_route(context, &candidate_sequence, &mut path_cache).await {
+            Some(lp) => {
+                context.debug(|| {
+                    format!(
+                        "Path found: {:?}",
+                        lp.iter().map(|e| e.get_id()).collect::<Vec<i64>>()
+                    )
+                });
+                return Ok((lp, candidate_sequence.first().unwrap().offset, candidate_sequence.last().unwrap().offset));
+            }
+            _ => {
+                context.debug(|| {
+                    format!(
+                        "Unable to find path for candidate sequence: {:?}",
+                        candidate_sequence
+                            .iter()
+                            .map(|c| c.candidate.get_id())
+                            .collect::<Vec<i64>>()
+                    )
+                });
+            }
+        }
+    }
+    return Err(OpenLrErr::NoPathFound);
+}
 
 pub(crate) async fn find_candidates<'a>(
     lrps: &'a Vec<LocationReferencePoint>,

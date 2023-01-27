@@ -1,8 +1,5 @@
-use std::collections::HashMap;
-
 use crate::binary_header::BinaryHeader;
-use crate::candidate_edge::CandidateEdge;
-use crate::common::{calculate_offset, find_location_route, get_next_coordinate, int2deg, trim, find_candidates};
+use crate::common::{calculate_offset, find_route_across_lrps, get_next_coordinate, int2deg, trim};
 use crate::decodable_reference::DecodableReference;
 use crate::decoding_parameters::DecodingParameters;
 use crate::deserializable_reference::DeserializableReference;
@@ -14,10 +11,8 @@ use crate::location::Location;
 use crate::location_reference::LocationReference;
 use crate::location_reference_point::LocationReferencePoint;
 use crate::request_context::RequestContext;
-use crate::route_generator::RouteGenerator;
 use crate::serializable_reference::SerializableReference;
 use async_trait::async_trait;
-use geo::Coord;
 use serde::Serialize;
 
 //--------------------------------------------------------------------//
@@ -136,48 +131,17 @@ impl DecodableReference for LineLocationReference {
         &self,
         context: &RequestContext<DecodingParameters>,
     ) -> Result<Location, OpenLrErr> {
-        let lrp_candidates = find_candidates(&self.lrps, context).await;
-
-        // the route generator creates pairs of candidate endpoints in the optimal order
-        let rg = RouteGenerator::new(lrp_candidates);
-        // some subpaths may be repeated across generatied sequences, so we cache subpaths in this hash map
-        let mut path_cache: HashMap<(i64, i64), Option<Vec<Edge>>> = HashMap::new();
-
-        // generate a fixed number of candidate sequences, and for each, attempt to connect LRP candidate edges
-        for candidate_sequence in rg.into_iter().take(context.params.max_routing_attempts) {
-            println!(
-                "Attempting to find path for location using candidate sequence: {:?}",
-                candidate_sequence
-                    .iter()
-                    .map(|c| c.candidate.get_id())
-                    .collect::<Vec<i64>>()
-            );
-            match find_location_route(context, &candidate_sequence, &mut path_cache).await {
-                Some(lp) => {
-                    // we've found a satisfactory route: record the start/end offsets based on the start/end candidate
-                    // unwrap is safe because star will either fail or else return a path with at least one edge
-                    let lrp_start_offset = candidate_sequence.first().unwrap().offset;
-                    let lrp_end_offset = candidate_sequence.last().unwrap().offset;
-                    context.debug(|| {
-                        format!(
-                            "Path found: {:?}",
-                            lp.iter().map(|e| e.get_id()).collect::<Vec<i64>>()
-                        )
-                    });
-                    return Ok(Location::Line(
-                        self.build_location(lp, lrp_start_offset, lrp_end_offset)
-                            .unwrap(),
-                    ));
-                }
-                _ => println!(
-                    "Unable to find path for candidate sequence: {:?}",
-                    candidate_sequence.iter().map(|c| c.candidate.get_id())
-                ),
-            }
+        match find_route_across_lrps(&self.lrps, context).await {
+            Ok((lp, pos_offset, neg_offset)) => {
+                // we've found a satisfactory route: record the start/end offsets based on the start/end candidate
+                // unwrap is safe because star will either fail or else return a path with at least one edge
+                Ok(Location::Line(
+                    self.build_location(lp, pos_offset, neg_offset)
+                        .unwrap()
+                ))
+            },
+            Err(e) => Err(e)
         }
-
-        context.info(|| format!("Unable to find path for location reference {:?}", self));
-        Err(OpenLrErr::NoPathFound)
     }
 }
 
