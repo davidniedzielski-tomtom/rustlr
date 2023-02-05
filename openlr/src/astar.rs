@@ -136,10 +136,9 @@ pub(crate) async fn find_acceptable_shortest_path<'a>(
             // Find all outgoing lines from the current line that satisfies LFRC constraints and
             // leaves the cumulative path length in the DNP Goldilocks zone (not too long).
             context
-                .map
+                .map_server
                 .get_next_lines(node.0.get_id(), node.0.get_metadata())
-                .await
-                .unwrap()
+                .await?
                 .into_iter()
                 .filter(|e| e.get_frc().to_usize() <= max_acceptable_frc)
                 .map(|n| {

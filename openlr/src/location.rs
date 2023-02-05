@@ -1,6 +1,8 @@
+use serde::Serialize;
+
 use crate::line::LineLocation;
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub enum Location {
     Line(LineLocation),
     Unknown,

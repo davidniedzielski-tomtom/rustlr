@@ -67,8 +67,7 @@ impl<'a> Iterator for RouteGenerator<'a> {
                     }
                 }
 
-                // Return this leading candidate after first resolving the indices to the candidate segments they
-                // represent.
+                // Return the vector of indices
                 Some(indices)
             }
             _ => None,

@@ -1,9 +1,9 @@
 use crate::log::{LogEntry, LogLevel};
-use crate::map::Map;
+use crate::map_server::MapServer;
 use std::sync::{Arc, Mutex};
 
 pub struct RequestContext<'a, ParamType> {
-    pub map: &'a dyn Map,
+    pub map_server: &'a dyn MapServer,
     pub params: &'a ParamType,
     log: Arc<Mutex<Vec<LogEntry>>>,
     log_level: u8,
@@ -74,12 +74,12 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     }
 
     pub fn new(
-        map: &'a dyn Map,
+        map_server: &'a dyn MapServer,
         params: &'a ParamType,
         log_level: LogLevel,
     ) -> RequestContext<'a, ParamType> {
         RequestContext {
-            map: map,
+            map_server: map_server,
             log: Arc::new(Mutex::new(Vec::<LogEntry>::new())),
             params: params,
             log_level: log_level as u8,

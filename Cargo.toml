@@ -1,4 +1,7 @@
 [workspace]
 members = [
   "openlr",
+  "openlr_server",
+  "mock_map_server",
+  "http_map_server",
 ]

@@ -1,6 +1,7 @@
+use serde::Serialize;
 use thiserror::Error;
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Serialize)]
 pub enum OpenLrErr {
     #[error("Invalid Edge WKT")]
     InvalidEdgeWKT,
@@ -54,6 +55,10 @@ pub enum OpenLrErr {
     Base64ParseError(String, String),
     #[error("Cannot deserialize. Invalid base64 string length: {0}")]
     InvalidBinaryStringLength(usize),
+    #[error("Error from radius search: {0}")]
+    NextSearchError(String),
+    #[error("Error from next edge search: {0}")]
+    NextEdgeError(String),
     #[error("Unknown error encountered during OpenLR processing")]
     Unknown,
 }

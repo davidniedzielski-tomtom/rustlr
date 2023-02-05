@@ -4,7 +4,7 @@ use ::async_trait::async_trait;
 use geo::Coord;
 
 #[async_trait]
-pub trait Map: Sync {
+pub trait MapServer: Sync + Send {
     async fn get_lines_near_coordinates(
         &self,
         points: Vec<Coord>,
@@ -15,7 +15,7 @@ pub trait Map: Sync {
     /// is equal to the set of outgoing lines of the end node of this line.
     async fn get_next_lines(
         &self,
-        src_edge_id: i64,
-        src_meta: String,
+        id: i64,
+        meta: String,
     ) -> Result<Vec<Edge>, OpenLrErr>;
 }

@@ -4,12 +4,13 @@ use openlr::edge::Edge;
 use openlr::errors::OpenLrErr;
 use openlr::fow::FOW;
 use openlr::frc::FRC;
-use openlr::map::Map;
+use openlr::map_server::MapServer;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 
+#[derive(Debug)]
 struct MapEntry {
     edge: Edge,
     start_node: i64,
@@ -25,6 +26,7 @@ impl MapEntry {
     }
 }
 
+#[derive(Debug)]
 pub struct MockMap {
     edge_map: HashMap<i64, MapEntry>,
 }
@@ -65,13 +67,12 @@ impl MockMap {
 }
 
 #[async_trait]
-impl Map for MockMap {
+impl MapServer for MockMap {
     async fn get_lines_near_coordinates(
         &self,
         points: Vec<Coord>,
         radius: u32,
     ) -> Result<Vec<Vec<Edge>>, OpenLrErr> {
-        println!("radius search: points: {:?}, radius: {}", points, radius);
         Ok(points
             .iter()
             .map(|c| {

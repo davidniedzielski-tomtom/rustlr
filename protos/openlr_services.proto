@@ -1,0 +1,64 @@
+// Copyright 2013-2019 TomTom International BV. All rights reserved.
+
+syntax = "proto3";
+
+package openlr_services;
+
+service MapService {
+	rpc RadiusSearch (RadiusSearchRequest) returns (RadiusSearchResponse);
+	rpc NextEdges (NextEdgesRequest) returns (EdgeSet);
+}
+
+message Coordinate {
+	double longitude = 1;
+	double latitude = 2;
+}
+
+message Edge {
+
+   enum FOW {
+      UNDEFINED = 0;
+      MOTORWAY = 1;
+      MULTIPLECARRIAGEWAY = 2;
+      SINGLECARRIAGEWAY = 3;
+      ROUNDABOUT = 4;
+      TRAFFICSQUARE = 5;
+      SLIPROAD = 6;
+      OTHER = 7;
+  }
+  enum FRC {
+      FRC0 = 0;
+      FRC1 = 1;
+      FRC2 = 2;
+      FRC3 = 3;
+      FRC4 = 4;
+      FRC5 = 5;
+      FRC6 = 6;
+      FRC7 = 7;
+  }
+
+	int64 id = 1;
+	string meta = 2;
+  FOW fow = 3;
+  FRC frc = 4;
+	uint32 len = 5;
+	repeated Coordinate coords = 6;
+}
+  
+message EdgeSet {
+  repeated Edge edges = 1;
+}
+
+message RadiusSearchRequest {
+  repeated Coordinate points = 1;
+  uint32 radius = 2;
+}
+
+message RadiusSearchResponse {
+  repeated EdgeSet edge_sets = 1;
+}
+
+message NextEdgesRequest {
+  int64 id = 1;
+  string meta = 2;
+}

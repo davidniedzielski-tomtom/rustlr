@@ -1,13 +1,11 @@
-mod mock_map;
-
 use std::path::PathBuf;
-
+use mock_map_server::mock_map::MockMap;
 use futures::executor::block_on;
-use mock_map::MockMap;
 use openlr;
 use openlr::decoding_parameters::DecodingParameters;
 use openlr::location::Location;
 use openlr::log::LogLevel;
+use serde::Serialize;
 
 #[test]
 fn test_decode1() {
@@ -110,6 +108,44 @@ fn test_decode4() {
     let loc = block_on(openlr::decode(
         1,
         &loc_ref,
+        &map,
+        &DecodingParameters::default(),
+        LogLevel::Debug,
+    ));
+    println!("{:?}", loc);
+    assert!(loc.result.is_ok());
+    match loc.result {
+        Ok(Location::Line(l)) => {
+            assert_eq!(l.edges.len(), 4);
+            assert_eq!(l.p_off, Some((31, 64)));
+            assert_eq!(l.n_off, Some((15, 19)));
+            assert_eq!(l.edges.get(0).unwrap().id, 11384678);
+            assert_eq!(l.edges.get(1).unwrap().id, 3551999);
+            assert_eq!(l.edges.get(2).unwrap().id, 12007589);
+            assert_eq!(l.edges.get(3).unwrap().id, 13042191);
+        }
+        _ => {
+            assert_eq!(1, 0);
+        }
+    }
+}
+
+#[test]
+fn test_serialize_line_loc_ref() {
+    let loc_ref = openlr::deserialize_binary("C/7VOCaEbSu/BP+5AMUrbJEQ").unwrap();
+    println!("{:?}", serde_json::to_string(&loc_ref).unwrap())
+}
+
+#[test]
+fn test_both() {
+    fn get_current_working_dir() -> std::io::Result<PathBuf> {
+        std::env::current_dir()
+    }
+    println!("{:?}", get_current_working_dir());
+    let map = MockMap::new_from_csv("test_data/test4.csv");
+    let loc = block_on(openlr::decode_binary(
+        "C/7VOCaEbSu/BP+5AMUrbJEQ",
+        1,
         &map,
         &DecodingParameters::default(),
         LogLevel::Debug,

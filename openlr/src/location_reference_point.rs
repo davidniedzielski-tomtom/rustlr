@@ -1,6 +1,6 @@
 use crate::candidate_edge::CandidateEdge;
 use crate::common;
-use crate::common::{calculate_circular_delta, distance_to_next_lrp, int2bearing};
+use crate::common::{distance_to_next_lrp, int2bearing};
 use crate::decoding_parameters::DecodingParameters;
 use crate::edge::Edge;
 use crate::errors::OpenLrErr;
@@ -18,6 +18,7 @@ pub struct LocationReferencePoint {
     pub(crate) frc: FRC,
     pub(crate) lowest_frc_to_next_point: Option<FRC>,
     pub(crate) bearing: (f64, f64),
+    #[serde(skip_serializing)]
     pub(crate) bearing_sector: u16,
     pub(crate) dnp: Option<(u32, u32)>,
     pub(crate) index: usize,

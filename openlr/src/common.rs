@@ -82,7 +82,7 @@ pub(crate) async fn find_candidates<'a>(
 ) -> Vec<Vec<CandidateEdge<'a>>> {
     // get a vector of candidate edges for each LRP in the LRP vector
     context
-        .map
+        .map_server
         .get_lines_near_coordinates(
             lrps.iter()
                 .map(|lrp| Coord {
@@ -93,6 +93,7 @@ pub(crate) async fn find_candidates<'a>(
             context.params.search_radius,
         )
         .await
+        .or::<Vec<Vec<Edge>>>(Ok(Vec::<Vec<Edge>>::new())) // harmlessly convert errors to an empty result
         .unwrap()
         .into_iter()
         .enumerate()

@@ -21,7 +21,7 @@ use serde::Serialize;
 //                                                                    //
 //--------------------------------------------------------------------//
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct LineLocationReference {
     pub(crate) header: BinaryHeader,
     pub(crate) lrps: Vec<LocationReferencePoint>,

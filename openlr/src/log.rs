@@ -1,4 +1,6 @@
-#[derive(Clone, Debug)]
+use serde::Serialize;
+
+#[derive(Clone, Debug, Serialize)]
 pub enum LogLevel {
     Trace = 0,
     Debug = 1,
@@ -8,7 +10,7 @@ pub enum LogLevel {
     Fatal = 5,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct LogEntry {
     level: LogLevel,
     txt: String,
