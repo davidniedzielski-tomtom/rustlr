@@ -90,10 +90,6 @@ impl MapServer for MockMap {
         src_edge_id: i64,
         src_meta: String,
     ) -> Result<Vec<Edge>, OpenLrErr> {
-        println!(
-            "next_line: src_edge: {}, src_meta: {}",
-            src_edge_id, src_meta
-        );
         let src = self.edge_map.get(&src_edge_id).unwrap();
         Ok(self
             .edge_map

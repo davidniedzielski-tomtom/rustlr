@@ -19,7 +19,7 @@ pub(crate) async fn find_route_across_lrps<'a>(
     lrps: &'a Vec<LocationReferencePoint>,
     context: &'a RequestContext<'a, DecodingParameters>,
 ) -> Result<(Vec<Edge>, u32, u32), OpenLrErr> {
-    let lrp_candidates = find_candidates(lrps, context).await;
+    let lrp_candidates = find_candidates(lrps, context).await?;
 
     // the route generator creates pairs of candidate endpoints in the optimal order
     let rg = RouteGenerator::new(&lrp_candidates);
@@ -39,13 +39,6 @@ pub(crate) async fn find_route_across_lrps<'a>(
                     .unwrap()
             })
             .collect::<Vec<&CandidateEdge>>();
-        println!(
-            "Attempting to find path for location using candidate sequence: {:?}",
-            candidate_sequence
-                .iter()
-                .map(|c| c.candidate.get_id())
-                .collect::<Vec<i64>>()
-        );
         match find_location_route(context, &candidate_sequence, &mut path_cache).await {
             Some(lp) => {
                 context.debug(|| {
@@ -79,9 +72,9 @@ pub(crate) async fn find_route_across_lrps<'a>(
 pub(crate) async fn find_candidates<'a>(
     lrps: &'a Vec<LocationReferencePoint>,
     context: &'a RequestContext<'a, DecodingParameters>,
-) -> Vec<Vec<CandidateEdge<'a>>> {
+) -> Result<Vec<Vec<CandidateEdge<'a>>>, OpenLrErr> {
     // get a vector of candidate edges for each LRP in the LRP vector
-    context
+    let candidates = context
         .map_server
         .get_lines_near_coordinates(
             lrps.iter()
@@ -92,13 +85,25 @@ pub(crate) async fn find_candidates<'a>(
                 .collect::<Vec<Coord>>(),
             context.params.search_radius,
         )
-        .await
-        .or::<Vec<Vec<Edge>>>(Ok(Vec::<Vec<Edge>>::new())) // harmlessly convert errors to an empty result
-        .unwrap()
+        .await?
         .into_iter()
         .enumerate()
-        .map(|(index, v)| lrps[index].find_candidate_edges(v, context).unwrap())
-        .collect::<Vec<Vec<CandidateEdge>>>()
+        .map(|(index, v)| {
+            lrps[index]
+                .find_candidate_edges(v, context)
+                .or::<Vec<CandidateEdge>>(Ok(Vec::<CandidateEdge>::new()))
+                .unwrap()
+        })
+        .collect::<Vec<Vec<CandidateEdge>>>();
+
+    if let Some((index, lrp)) = candidates
+        .iter()
+        .enumerate()
+        .find(|(index, v)| v.is_empty()) {
+            return Err(OpenLrErr::NoCandidatesFoundForLRP(index))
+        } else {
+            Ok(candidates)
+        }
 }
 
 pub(crate) async fn find_location_route(
