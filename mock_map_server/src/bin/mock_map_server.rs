@@ -75,14 +75,21 @@ fn proto_edge_from_edge(e: &Edge) -> ProtoEdge {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    simple_logger::init_with_env().unwrap();
     let args = Arguments::parse();
     let address = args.address.parse().unwrap();
     let map_service = MockMapService::new(&args.file_path);
+
+    log::info!("Mock map server with source: {} initializing...", args.file_path);
+    log::info!("Mock map server listening on port: {}...", args.address);
 
     Server::builder()
         .add_service(MapServiceServer::new(map_service))
         .serve(address)
         .await?;
+
+    log::info!("Mock map server terminating...");
+
     Ok(())
 }
 

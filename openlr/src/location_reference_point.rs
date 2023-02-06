@@ -160,7 +160,7 @@ impl LocationReferencePoint {
         {
             context.debug(|| {
                 format!(
-                    "projection of LRP {} snapped to interior of edge {} at offset ({}m)",
+                    "Projection of LRP {} snapped to interior of edge {} at offset ({}m)",
                     self.index,
                     edge.get_id(),
                     d
@@ -171,7 +171,7 @@ impl LocationReferencePoint {
             if self.is_last {
                 context.debug(|| {
                     format!(
-                    "projection of last LRP {} onto edge {} snapped to end node due to proximity ({}m)",
+                    "Projection of last LRP {} onto edge {} snapped to end node due to proximity ({}m)",
                     self.index,
                     edge.get_id(),
                     d
@@ -179,7 +179,7 @@ impl LocationReferencePoint {
                 });
             } else {
                 context.debug(|| format!(
-                    "projection of first or intermediate LRP {} onto edge {} snapped to start node due to proximity ({}m)", 
+                    "Projection of first or intermediate LRP {} onto edge {} snapped to start node due to proximity ({}m)", 
                     self.index,
                     edge.get_id(),
                     d

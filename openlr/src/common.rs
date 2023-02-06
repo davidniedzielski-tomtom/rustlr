@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 use geo::Coord;
 use itertools::Itertools;
@@ -73,37 +73,44 @@ pub(crate) async fn find_candidates<'a>(
     lrps: &'a Vec<LocationReferencePoint>,
     context: &'a RequestContext<'a, DecodingParameters>,
 ) -> Result<Vec<Vec<CandidateEdge<'a>>>, OpenLrErr> {
-    // get a vector of candidate edges for each LRP in the LRP vector
-    let candidates = context
-        .map_server
-        .get_lines_near_coordinates(
-            lrps.iter()
-                .map(|lrp| Coord {
-                    x: lrp.longitude,
-                    y: lrp.latitude,
-                })
-                .collect::<Vec<Coord>>(),
-            context.params.search_radius,
-        )
-        .await?
-        .into_iter()
-        .enumerate()
-        .map(|(index, v)| {
-            lrps[index]
-                .find_candidate_edges(v, context)
-                .or::<Vec<CandidateEdge>>(Ok(Vec::<CandidateEdge>::new()))
-                .unwrap()
-        })
-        .collect::<Vec<Vec<CandidateEdge>>>();
+    let mut nearby_edges = VecDeque::from(
+        context
+            .map_server
+            .get_lines_near_coordinates(
+                lrps.iter()
+                    .map(|lrp| Coord {
+                        x: lrp.longitude,
+                        y: lrp.latitude,
+                    })
+                    .collect::<Vec<Coord>>(),
+                context.params.search_radius,
+            )
+            .await?,
+    );
 
-    if let Some((index, lrp)) = candidates
-        .iter()
-        .enumerate()
-        .find(|(index, v)| v.is_empty()) {
-            return Err(OpenLrErr::NoCandidatesFoundForLRP(index))
-        } else {
-            Ok(candidates)
+    let mut candidates = Vec::<Vec<CandidateEdge>>::new();
+
+    if context.is_enabled_for_debug() {
+        for (i, v) in nearby_edges.iter().enumerate() {
+            let eids = v.iter().map(|e| e.id).collect::<Vec<i64>>();
+            context.debug(|| format!("Edges near LRP {} (lon: {}, lat: {}): {:?}", i, lrps[i].longitude, lrps[i].latitude, eids));
         }
+    }
+
+    for lrp in lrps {
+        let v = lrp.find_candidate_edges(nearby_edges.pop_front().unwrap(), context);
+        match v {
+            Ok(v) => {
+                if context.is_enabled_for_debug() {
+                    let cids = v.iter().map(|c| (c.candidate.id, c.offset, c.score)).collect::<Vec<(i64, u32, f64)>>();
+                    context.debug(|| format!("Scored candidates (id, offset, score) for LRP {}: {:?}", lrp.index, cids));
+                }
+                candidates.push(v)
+            },
+            Err(e) => return Err(e),
+        }
+    }
+    return Ok(candidates);
 }
 
 pub(crate) async fn find_location_route(

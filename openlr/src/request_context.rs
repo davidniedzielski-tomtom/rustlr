@@ -10,11 +10,30 @@ pub struct RequestContext<'a, ParamType> {
 }
 
 impl<'a, ParamType> RequestContext<'a, ParamType> {
+    pub fn is_enabled_for_trace(&self) -> bool {
+        self.log_level <= LogLevel::Trace as u8
+    }
+    pub fn is_enabled_for_debug(&self) -> bool {
+        self.log_level <= LogLevel::Debug as u8
+    }
+    pub fn is_enabled_for_info(&self) -> bool {
+        self.log_level <= LogLevel::Info as u8
+    }
+    pub fn is_enabled_for_warn(&self) -> bool {
+        self.log_level <= LogLevel::Warn as u8
+    }
+    pub fn is_enabled_for_error(&self) -> bool {
+        self.log_level <= LogLevel::Error as u8
+    }
+    pub fn is_enabled_for_fatal(&self) -> bool {
+        self.log_level <= LogLevel::Fatal as u8
+    }
+
     pub fn trace<F>(&self, f: F)
     where
         F: Fn() -> String,
     {
-        if self.log_level <= LogLevel::Trace as u8 {
+        if self.is_enabled_for_trace() {
             self.log(LogLevel::Trace, f);
         }
     }
@@ -22,7 +41,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level <= LogLevel::Debug as u8 {
+        if self.is_enabled_for_debug() {
             self.log(LogLevel::Debug, f);
         }
     }
@@ -30,7 +49,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level <= LogLevel::Info as u8 {
+        if self.is_enabled_for_info() {
             self.log(LogLevel::Info, f);
         }
     }
@@ -38,7 +57,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level <= LogLevel::Warn as u8 {
+        if self.is_enabled_for_warn() {
             self.log(LogLevel::Warn, f);
         }
     }
@@ -46,7 +65,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level <= LogLevel::Error as u8 {
+        if self.is_enabled_for_error() {
             self.log(LogLevel::Error, f);
         }
     }
@@ -54,7 +73,7 @@ impl<'a, ParamType> RequestContext<'a, ParamType> {
     where
         F: Fn() -> String,
     {
-        if self.log_level <= LogLevel::Fatal as u8 {
+        if self.is_enabled_for_fatal() {
             self.log(LogLevel::Fatal, f);
         }
     }

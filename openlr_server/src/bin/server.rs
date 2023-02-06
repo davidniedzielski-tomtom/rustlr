@@ -1,7 +1,7 @@
+use clap::Parser;
 use std::collections::hash_map::Entry;
 use std::sync::Arc;
 
-use actix_web::web::Data;
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use openlr::log::LogLevel;
 use openlr_server::decode_request::DecodeRequest;
@@ -9,6 +9,15 @@ use openlr_server::grpc_map_proxy::GRPCMapProxy;
 use openlr_server::http_map_proxy::HttpMapProxy;
 use openlr_server::server_context::ServerContext;
 use reqwest::Url;
+
+#[derive(Parser, Default, Debug)]
+#[clap(author = "TomTom International", version, about)]
+/// Mock Map gRPC MapServer
+pub struct Arguments {
+    #[clap(default_value_t=String::from("[::1]:8080"),short, long)]
+    /// Interface address to bind to (i.e. 127.0.0.1:8080)
+    address: String,
+}
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -85,8 +94,11 @@ async fn decode(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    //std::env::set_var("RUST_LOG", "trace");
-    env_logger::init();
+    simple_logger::init_with_env().unwrap();
+    let args = Arguments::parse();
+    log::info!("OpenLR server initializing...");
+    log::info!("Binding to {}", args.address);
+
     let context = web::Data::new(ServerContext::new());
     HttpServer::new(move || {
         App::new()
@@ -95,7 +107,7 @@ async fn main() -> std::io::Result<()> {
             .service(echo)
             .route("/decode", web::post().to(decode))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(args.address)?
     .run()
     .await
 }
