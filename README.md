@@ -1,19 +1,24 @@
 # RustLR: distributed, asynchronous, language agnostic, opinionated OpenLR decoder
 
-RustLR is an OpenLR decoder library and framework that attempts to combine the
-best ideas of existing decoders while addressing some of their shortcomings.  
+RustLR is an OpenLR library and framework that attempts to combine the best
+ideas of existing decoders while addressing some of their shortcomings.  At
+present, only decoding is supported for a limited set of Location types.
+Encoding support is forthcoming.
+
+This is intended to be the core of the next generation of the so-called "OpenLR
+WebTool".  
 
 # Why yet another OpenLR implementation?
 
-- Fast decoder logic: written (probably badly) in Rust
+- Fast decoder logic: written (badly) in Rust
 - Fast, reliable transport: uses gRPC via protobufs for map adapter <-> decoder communication
 - Realtime: map adapters can directly access live customer data rather than using an imported snapshot
 - Language agnostic architecture: clients, decoder, and map adapters are decoupled
-- Protocol agnostic architecture: SWIG, Unix domain sockets, Kafka, WebSockets, HTTP/S, etc...
+- Protocol agnostic architecture: gRPC, REST, SWIG, Unix domain sockets, Kafka, WebSockets, etc...
 - Simple adapter API: only 2 methods to implement (Java reference decoder requires 34 implementations)
 - Distributed: decoder logic, MapDatabase adapters, and clients are logically independent and can be deployed and scaled independently
 - Accurate: correctly handles ranges for bearings, DNPs, and offsets resulting from binary OpenLR “buckets”
-- Correct: LRP candidate combinations are considered in correct order
+- Correct: LRP candidate combinations are considered in the correct order
 - Asynchronous: decoding threads not blocked waiting for I/O from Map adapters
 - Flexible tuning parameters: i.e. expected/actual FOW/FRC/bearing tables are fully exposed and customisable
 - Improved diagnostics: diagnostic level chosen for each request, and log messages returned with response

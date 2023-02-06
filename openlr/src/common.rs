@@ -73,6 +73,9 @@ pub(crate) async fn find_candidates<'a>(
     lrps: &'a Vec<LocationReferencePoint>,
     context: &'a RequestContext<'a, DecodingParameters>,
 ) -> Result<Vec<Vec<CandidateEdge<'a>>>, OpenLrErr> {
+
+    // for each lrp, gather a vector of edges that are spatially near the point
+    // do all lrps at once to minimize the latency to the mapserver
     let mut nearby_edges = VecDeque::from(
         context
             .map_server
@@ -90,6 +93,7 @@ pub(crate) async fn find_candidates<'a>(
 
     let mut candidates = Vec::<Vec<CandidateEdge>>::new();
 
+    // if the caller is curious, record the edges near each lrp
     if context.is_enabled_for_debug() {
         for (i, v) in nearby_edges.iter().enumerate() {
             let eids = v.iter().map(|e| e.id).collect::<Vec<i64>>();
@@ -97,6 +101,7 @@ pub(crate) async fn find_candidates<'a>(
         }
     }
 
+    // evaulate each candidate for each lrp, and select only those whose score is acceptable
     for lrp in lrps {
         let v = lrp.find_candidate_edges(nearby_edges.pop_front().unwrap(), context);
         match v {
