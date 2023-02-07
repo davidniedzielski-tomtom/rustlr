@@ -1,5 +1,5 @@
 [package]
-name = "mock_map_server"
+name = "mock_map_agent"
 version = "0.1.0"
 edition = "2021"
 

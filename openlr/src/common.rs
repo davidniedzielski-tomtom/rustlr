@@ -79,7 +79,7 @@ pub(crate) async fn find_candidates<'a>(
     let mut nearby_edges = VecDeque::from(
         context
             .map_server
-            .get_lines_near_coordinates(
+            .get_nearby_edges(
                 lrps.iter()
                     .map(|lrp| Coord {
                         x: lrp.longitude,

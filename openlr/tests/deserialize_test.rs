@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use mock_map_server::mock_map::MockMap;
+use mock_map_agent::mock_map::MockMap;
 use futures::executor::block_on;
 use openlr;
 use openlr::decoding_parameters::DecodingParameters;

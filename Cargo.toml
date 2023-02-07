@@ -2,6 +2,6 @@
 members = [
   "openlr",
   "openlr_server",
-  "mock_map_server",
+  "mock_map_agent",
   "http_map_server",
 ]

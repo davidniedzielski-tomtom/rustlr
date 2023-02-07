@@ -35,27 +35,27 @@ The server accepts requests from clients containing the following elements:
 - request id (used to associate asynchronous responses with requests)
 - OpenLR LocationReference or binary string (decoding) or OpenLR Location (encoding)
 - named set of decoding/encoding parameters
-- reference to a map server representing the target map
-- credentials authenticating client to selected map server
+- reference to a map agent representing the target map
+- credentials authenticating client to selected map agent
 - logging verbosity level
 
-The server makes requests to the map server over the map server specific
+The server makes requests to the map agent over the agent-specific
 protocol (currently REST and gRPC are implemented) and sends to the client
 either an OpenLR Location and log messages, or else an explanatory error.  The
 decoder is completely asynchronous, and can process an aribtrary number of
 client requests concurrently without blocking on requests to the OS or to the
-map database server.  
+map database agent.  
 
-## Map database server
+## Map agents
 Similar in spirit to the abstract map adapter found in the Openlr Java reference
-implementation, the map database is a server that responds to geospatial
+implementation, the map agent is a server that responds to geospatial
 requests from the decoder over an arbitrary transport (currently REST and gRPC
 are the only transports implemented).  It at least is able to perform a simple
 radius search for edges(raods) in it's map within a certain radius of a point,
 and also determine which edges (raods) are reachable from a given source edge.
-It can opetionally return metadata about the map it is serving, including the
+It can optionally return metadata about the map it is serving, including the
 bounding box, source, and version.  There can be an arbitary number of map
-database servers running at any time, each proxying a map against which OpenLR
+database agents running at any time, each proxying a map against which OpenLR
 codes are to be decoded. 
 
 ## Client

@@ -1,9 +1,9 @@
-use openlr::{map_server::MapServer, decoding_parameters::DecodingParameters};
+use openlr::{map::Map, decoding_parameters::DecodingParameters};
 use std::{collections::HashMap, sync::{Mutex, Arc}};
 use url::Url;
 
 pub struct ServerContext {
-    pub mdbs: Mutex<HashMap<Url, Arc<dyn MapServer>>>,
+    pub mdbs: Mutex<HashMap<Url, Arc<dyn Map>>>,
     pub params: Mutex<HashMap<String, Arc<DecodingParameters>>>,
 }
 
@@ -20,7 +20,7 @@ impl ServerContext {
         }
     }
 
-    pub fn add_map_database(&mut self, key:Url, value: Arc<dyn MapServer>) {
+    pub fn add_map_database(&mut self, key:Url, value: Arc<dyn Map>) {
         self.mdbs.lock().unwrap().insert(key,value);
     }
 

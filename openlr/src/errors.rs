@@ -15,8 +15,8 @@ pub enum OpenLrErr {
     EdgeRetrievalError(i64, String),
     #[error("Error retrieving next lines for edge {0}: {1}")]
     NextLinesError(i64, String),
-    #[error("Error performing radius search: {0}")]
-    RadiusSearchError(String),
+    #[error("Error performing nearby edges search: {0}")]
+    NearbyEdgesError(String),
     #[error("Cannot build Location from empty Edge vector")]
     EmptyEdgeVec,
     #[error("Negative offset spans entire found path")]

@@ -18,7 +18,7 @@ pub mod location_reference;
 pub(crate) mod location_reference_point;
 pub(crate) mod location_type;
 pub mod log;
-pub mod map_server;
+pub mod map;
 pub(crate) mod request_context;
 pub mod request_result;
 pub(crate) mod route_generator;
@@ -34,7 +34,7 @@ use crate::location::Location;
 use crate::location_reference::LocationReference;
 use crate::location_type::LocationType;
 use crate::log::LogLevel;
-use crate::map_server::MapServer;
+use crate::map::Map;
 use deserializable_reference::DeserializableReference;
 use line::LineLocationReference;
 use crate::log::LogEntry;
@@ -44,7 +44,7 @@ use request_result::RequestResult;
 pub async fn decode(
     id: u64,
     locref: &LocationReference,
-    map_server: &dyn MapServer,
+    map_server: &dyn Map,
     params: &DecodingParameters,
     level: LogLevel,
 ) -> RequestResult<Location> {
@@ -61,7 +61,7 @@ pub async fn decode(
 
 pub async fn encode(
     loc: &Location,
-    map_server: &dyn MapServer,
+    map_server: &dyn Map,
     params: &EncodingParameters,
     level: LogLevel,
 ) -> Result<LocationReference, OpenLrErr> {
@@ -94,7 +94,7 @@ pub fn deserialize_binary(bin: &str) -> Result<LocationReference, OpenLrErr> {
 pub async fn decode_binary(
     bin: &str,
     id: u64,
-    map_server: &dyn MapServer,
+    map_server: &dyn Map,
     params: &DecodingParameters,
     level: LogLevel,
 ) -> RequestResult<Location> {

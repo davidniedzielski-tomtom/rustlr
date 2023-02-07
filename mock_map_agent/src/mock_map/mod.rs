@@ -4,7 +4,7 @@ use openlr::edge::Edge;
 use openlr::errors::OpenLrErr;
 use openlr::fow::FOW;
 use openlr::frc::FRC;
-use openlr::map_server::MapServer;
+use openlr::map::Map;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
@@ -67,8 +67,8 @@ impl MockMap {
 }
 
 #[async_trait]
-impl MapServer for MockMap {
-    async fn get_lines_near_coordinates(
+impl Map for MockMap {
+    async fn get_nearby_edges(
         &self,
         points: Vec<Coord>,
         radius: u32,
@@ -85,7 +85,7 @@ impl MapServer for MockMap {
             .collect::<Vec<Vec<Edge>>>())
     }
 
-    async fn get_next_lines(
+    async fn get_next_edges(
         &self,
         src_edge_id: i64,
         src_meta: String,

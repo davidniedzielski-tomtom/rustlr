@@ -4,7 +4,7 @@ import grpc
 import openlr_services_pb2 as openlr__services__pb2
 
 
-class MapServiceStub(object):
+class MapAgentStub(object):
   # missing associated documentation comment in .proto file
   pass
 
@@ -14,30 +14,30 @@ class MapServiceStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.RadiusSearch = channel.unary_unary(
-        '/openlr_services.MapService/RadiusSearch',
-        request_serializer=openlr__services__pb2.RadiusSearchRequest.SerializeToString,
-        response_deserializer=openlr__services__pb2.RadiusSearchResponse.FromString,
+    self.GetNearbyEdges = channel.unary_unary(
+        '/openlr_services.MapAgent/GetNearbyEdges',
+        request_serializer=openlr__services__pb2.NearbyEdgesRequest.SerializeToString,
+        response_deserializer=openlr__services__pb2.NearbyEdgesResponse.FromString,
         )
-    self.NextEdges = channel.unary_unary(
-        '/openlr_services.MapService/NextEdges',
+    self.GetNextEdges = channel.unary_unary(
+        '/openlr_services.MapAgent/GetNextEdges',
         request_serializer=openlr__services__pb2.NextEdgesRequest.SerializeToString,
         response_deserializer=openlr__services__pb2.EdgeSet.FromString,
         )
 
 
-class MapServiceServicer(object):
+class MapAgentServicer(object):
   # missing associated documentation comment in .proto file
   pass
 
-  def RadiusSearch(self, request, context):
+  def GetNearbyEdges(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def NextEdges(self, request, context):
+  def GetNextEdges(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -45,19 +45,19 @@ class MapServiceServicer(object):
     raise NotImplementedError('Method not implemented!')
 
 
-def add_MapServiceServicer_to_server(servicer, server):
+def add_MapAgentServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'RadiusSearch': grpc.unary_unary_rpc_method_handler(
-          servicer.RadiusSearch,
-          request_deserializer=openlr__services__pb2.RadiusSearchRequest.FromString,
-          response_serializer=openlr__services__pb2.RadiusSearchResponse.SerializeToString,
+      'GetNearbyEdges': grpc.unary_unary_rpc_method_handler(
+          servicer.GetNearbyEdges,
+          request_deserializer=openlr__services__pb2.NearbyEdgesRequest.FromString,
+          response_serializer=openlr__services__pb2.NearbyEdgesResponse.SerializeToString,
       ),
-      'NextEdges': grpc.unary_unary_rpc_method_handler(
-          servicer.NextEdges,
+      'GetNextEdges': grpc.unary_unary_rpc_method_handler(
+          servicer.GetNextEdges,
           request_deserializer=openlr__services__pb2.NextEdgesRequest.FromString,
           response_serializer=openlr__services__pb2.EdgeSet.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'openlr_services.MapService', rpc_method_handlers)
+      'openlr_services.MapAgent', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))

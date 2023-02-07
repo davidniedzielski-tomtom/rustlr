@@ -1,8 +1,9 @@
 use clap::Parser;
 use geo::Coord;
-use mock_map_server::mock_map::MockMap;
-use openlr::map_server::MapServer;
+use mock_map_agent::mock_map::MockMap;
+use openlr::map::Map;
 use openlr::{edge::Edge, fow::FOW, frc::FRC};
+use openlr_services::map_agent_server::MapAgent;
 use tonic::Code;
 use tonic::{transport::Server, Request, Response, Status};
 
@@ -22,8 +23,8 @@ pub mod openlr_services {
 }
 
 use openlr_services::{
-    map_service_server::{MapService, MapServiceServer},
-    Coordinate, EdgeSet, NextEdgesRequest, RadiusSearchRequest, RadiusSearchResponse,
+    map_agent_server::MapAgentServer,
+    Coordinate, EdgeSet, NextEdgesRequest, NearbyEdgesRequest, NearbyEdgesResponse,
 };
 
 use openlr_services::Edge as ProtoEdge;
@@ -84,7 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Mock map server listening on port: {}...", args.address);
 
     Server::builder()
-        .add_service(MapServiceServer::new(map_service))
+        .add_service(MapAgentServer::new(map_service))
         .serve(address)
         .await?;
 
@@ -107,14 +108,14 @@ impl MockMapService {
 }
 
 #[tonic::async_trait]
-impl MapService for MockMapService {
-    async fn next_edges(
+impl MapAgent for MockMapService {
+    async fn get_next_edges(
         &self,
         request: Request<NextEdgesRequest>,
     ) -> Result<Response<EdgeSet>, Status> {
         let rsp = self
             .mock_map
-            .get_next_lines(request.get_ref().id, request.get_ref().meta.clone())
+            .get_next_edges(request.get_ref().id, request.get_ref().meta.clone())
             .await
             .or_else(|e| Err(Status::new(Code::Internal, e.to_string())))?;
         Ok(Response::new(EdgeSet {
@@ -125,15 +126,15 @@ impl MapService for MockMapService {
         }))
     }
 
-    async fn radius_search(
+    async fn get_nearby_edges(
         &self,
-        request: Request<RadiusSearchRequest>,
-    ) -> Result<Response<RadiusSearchResponse>, Status> {
+        request: Request<NearbyEdgesRequest>,
+    ) -> Result<Response<NearbyEdgesResponse>, Status> {
         let rsr = request.into_inner();
 
         let edge_sets = self
             .mock_map
-            .get_lines_near_coordinates(
+            .get_nearby_edges(
                 rsr.points
                     .iter()
                     .map(|c| Coord {
@@ -153,6 +154,6 @@ impl MapService for MockMapService {
             })
             .collect::<Vec<EdgeSet>>();
 
-            Ok ( Response::new(RadiusSearchResponse { edge_sets } ) )
+            Ok ( Response::new(NearbyEdgesResponse { edge_sets } ) )
     }
 }

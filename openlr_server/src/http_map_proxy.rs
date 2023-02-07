@@ -1,5 +1,5 @@
 use geo::Coord;
-use openlr::{map_server::MapServer, edge::Edge, errors::OpenLrErr};
+use openlr::{map::Map, edge::Edge, errors::OpenLrErr};
 use async_trait::async_trait;
 use reqwest::Url;
 use serde::Serialize;
@@ -63,8 +63,8 @@ impl HttpMapProxy {
 }
 
 #[async_trait]
-impl MapServer for HttpMapProxy {
-    async fn get_lines_near_coordinates(
+impl Map for HttpMapProxy {
+    async fn get_nearby_edges(
         &self,
         points: Vec<Coord>,
         radius: u32,
@@ -74,7 +74,7 @@ impl MapServer for HttpMapProxy {
 
     /// Returns a set of lines which follows this line in the same direction. The set of lines
     /// is equal to the set of outgoing lines of the end node of this line.
-    async fn get_next_lines(
+    async fn get_next_edges(
         &self,
         id: i64,
         meta: String,

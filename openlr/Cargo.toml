@@ -24,7 +24,7 @@ wkt = "0.10.3"
 duration-string = "0.2.0"
 
 [dev-dependencies]
-mock_map_server = { path = "../mock_map_server" }
+mock_map_agent = { path = "../mock_map_agent" }
 approx = "0.5.1"
 maplit = "1.0.2"
 simple_logger = "2.2.0"

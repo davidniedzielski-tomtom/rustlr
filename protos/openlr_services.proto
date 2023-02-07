@@ -4,9 +4,9 @@ syntax = "proto3";
 
 package openlr_services;
 
-service MapService {
-	rpc RadiusSearch (RadiusSearchRequest) returns (RadiusSearchResponse);
-	rpc NextEdges (NextEdgesRequest) returns (EdgeSet);
+service MapAgent {
+	rpc GetNearbyEdges (NearbyEdgesRequest) returns (NearbyEdgesResponse);
+	rpc GetNextEdges (NextEdgesRequest) returns (EdgeSet);
 }
 
 message Coordinate {
@@ -49,12 +49,12 @@ message EdgeSet {
   repeated Edge edges = 1;
 }
 
-message RadiusSearchRequest {
+message NearbyEdgesRequest {
   repeated Coordinate points = 1;
   uint32 radius = 2;
 }
 
-message RadiusSearchResponse {
+message NearbyEdgesResponse {
   repeated EdgeSet edge_sets = 1;
 }
 

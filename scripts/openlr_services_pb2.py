@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='openlr_services',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x15openlr_services.proto\x12\x0fopenlr_services\"1\n\nCoordinate\x12\x11\n\tlongitude\x18\x01 \x01(\x01\x12\x10\n\x08latitude\x18\x02 \x01(\x01\"\x92\x03\n\x04\x45\x64ge\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04meta\x18\x02 \x01(\t\x12&\n\x03\x66ow\x18\x03 \x01(\x0e\x32\x19.openlr_services.Edge.FOW\x12&\n\x03\x66rc\x18\x04 \x01(\x0e\x32\x19.openlr_services.Edge.FRC\x12\x0b\n\x03len\x18\x05 \x01(\r\x12+\n\x06\x63oords\x18\x06 \x03(\x0b\x32\x1b.openlr_services.Coordinate\"\x8e\x01\n\x03\x46OW\x12\r\n\tUNDEFINED\x10\x00\x12\x0c\n\x08MOTORWAY\x10\x01\x12\x17\n\x13MULTIPLECARRIAGEWAY\x10\x02\x12\x15\n\x11SINGLECARRIAGEWAY\x10\x03\x12\x0e\n\nROUNDABOUT\x10\x04\x12\x11\n\rTRAFFICSQUARE\x10\x05\x12\x0c\n\x08SLIPROAD\x10\x06\x12\t\n\x05OTHER\x10\x07\"U\n\x03\x46RC\x12\x08\n\x04\x46RC0\x10\x00\x12\x08\n\x04\x46RC1\x10\x01\x12\x08\n\x04\x46RC2\x10\x02\x12\x08\n\x04\x46RC3\x10\x03\x12\x08\n\x04\x46RC4\x10\x04\x12\x08\n\x04\x46RC5\x10\x05\x12\x08\n\x04\x46RC6\x10\x06\x12\x08\n\x04\x46RC7\x10\x07\"/\n\x07\x45\x64geSet\x12$\n\x05\x65\x64ges\x18\x01 \x03(\x0b\x32\x15.openlr_services.Edge\"R\n\x13RadiusSearchRequest\x12+\n\x06points\x18\x01 \x03(\x0b\x32\x1b.openlr_services.Coordinate\x12\x0e\n\x06radius\x18\x02 \x01(\r\"C\n\x14RadiusSearchResponse\x12+\n\tedge_sets\x18\x01 \x03(\x0b\x32\x18.openlr_services.EdgeSet\",\n\x10NextEdgesRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04meta\x18\x02 \x01(\t2\xb3\x01\n\nMapService\x12[\n\x0cRadiusSearch\x12$.openlr_services.RadiusSearchRequest\x1a%.openlr_services.RadiusSearchResponse\x12H\n\tNextEdges\x12!.openlr_services.NextEdgesRequest\x1a\x18.openlr_services.EdgeSetb\x06proto3')
+  serialized_pb=_b('\n\x15openlr_services.proto\x12\x0fopenlr_services\"1\n\nCoordinate\x12\x11\n\tlongitude\x18\x01 \x01(\x01\x12\x10\n\x08latitude\x18\x02 \x01(\x01\"\x92\x03\n\x04\x45\x64ge\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04meta\x18\x02 \x01(\t\x12&\n\x03\x66ow\x18\x03 \x01(\x0e\x32\x19.openlr_services.Edge.FOW\x12&\n\x03\x66rc\x18\x04 \x01(\x0e\x32\x19.openlr_services.Edge.FRC\x12\x0b\n\x03len\x18\x05 \x01(\r\x12+\n\x06\x63oords\x18\x06 \x03(\x0b\x32\x1b.openlr_services.Coordinate\"\x8e\x01\n\x03\x46OW\x12\r\n\tUNDEFINED\x10\x00\x12\x0c\n\x08MOTORWAY\x10\x01\x12\x17\n\x13MULTIPLECARRIAGEWAY\x10\x02\x12\x15\n\x11SINGLECARRIAGEWAY\x10\x03\x12\x0e\n\nROUNDABOUT\x10\x04\x12\x11\n\rTRAFFICSQUARE\x10\x05\x12\x0c\n\x08SLIPROAD\x10\x06\x12\t\n\x05OTHER\x10\x07\"U\n\x03\x46RC\x12\x08\n\x04\x46RC0\x10\x00\x12\x08\n\x04\x46RC1\x10\x01\x12\x08\n\x04\x46RC2\x10\x02\x12\x08\n\x04\x46RC3\x10\x03\x12\x08\n\x04\x46RC4\x10\x04\x12\x08\n\x04\x46RC5\x10\x05\x12\x08\n\x04\x46RC6\x10\x06\x12\x08\n\x04\x46RC7\x10\x07\"/\n\x07\x45\x64geSet\x12$\n\x05\x65\x64ges\x18\x01 \x03(\x0b\x32\x15.openlr_services.Edge\"Q\n\x12NearbyEdgesRequest\x12+\n\x06points\x18\x01 \x03(\x0b\x32\x1b.openlr_services.Coordinate\x12\x0e\n\x06radius\x18\x02 \x01(\r\"B\n\x13NearbyEdgesResponse\x12+\n\tedge_sets\x18\x01 \x03(\x0b\x32\x18.openlr_services.EdgeSet\",\n\x10NextEdgesRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04meta\x18\x02 \x01(\t2\xb4\x01\n\x08MapAgent\x12[\n\x0eGetNearbyEdges\x12#.openlr_services.NearbyEdgesRequest\x1a$.openlr_services.NearbyEdgesResponse\x12K\n\x0cGetNextEdges\x12!.openlr_services.NextEdgesRequest\x1a\x18.openlr_services.EdgeSetb\x06proto3')
 )
 
 
@@ -254,22 +254,22 @@ _EDGESET = _descriptor.Descriptor(
 )
 
 
-_RADIUSSEARCHREQUEST = _descriptor.Descriptor(
-  name='RadiusSearchRequest',
-  full_name='openlr_services.RadiusSearchRequest',
+_NEARBYEDGESREQUEST = _descriptor.Descriptor(
+  name='NearbyEdgesRequest',
+  full_name='openlr_services.NearbyEdgesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='points', full_name='openlr_services.RadiusSearchRequest.points', index=0,
+      name='points', full_name='openlr_services.NearbyEdgesRequest.points', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='radius', full_name='openlr_services.RadiusSearchRequest.radius', index=1,
+      name='radius', full_name='openlr_services.NearbyEdgesRequest.radius', index=1,
       number=2, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -288,19 +288,19 @@ _RADIUSSEARCHREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=547,
-  serialized_end=629,
+  serialized_end=628,
 )
 
 
-_RADIUSSEARCHRESPONSE = _descriptor.Descriptor(
-  name='RadiusSearchResponse',
-  full_name='openlr_services.RadiusSearchResponse',
+_NEARBYEDGESRESPONSE = _descriptor.Descriptor(
+  name='NearbyEdgesResponse',
+  full_name='openlr_services.NearbyEdgesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='edge_sets', full_name='openlr_services.RadiusSearchResponse.edge_sets', index=0,
+      name='edge_sets', full_name='openlr_services.NearbyEdgesResponse.edge_sets', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -318,8 +318,8 @@ _RADIUSSEARCHRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=631,
-  serialized_end=698,
+  serialized_start=630,
+  serialized_end=696,
 )
 
 
@@ -356,8 +356,8 @@ _NEXTEDGESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=700,
-  serialized_end=744,
+  serialized_start=698,
+  serialized_end=742,
 )
 
 _EDGE.fields_by_name['fow'].enum_type = _EDGE_FOW
@@ -366,13 +366,13 @@ _EDGE.fields_by_name['coords'].message_type = _COORDINATE
 _EDGE_FOW.containing_type = _EDGE
 _EDGE_FRC.containing_type = _EDGE
 _EDGESET.fields_by_name['edges'].message_type = _EDGE
-_RADIUSSEARCHREQUEST.fields_by_name['points'].message_type = _COORDINATE
-_RADIUSSEARCHRESPONSE.fields_by_name['edge_sets'].message_type = _EDGESET
+_NEARBYEDGESREQUEST.fields_by_name['points'].message_type = _COORDINATE
+_NEARBYEDGESRESPONSE.fields_by_name['edge_sets'].message_type = _EDGESET
 DESCRIPTOR.message_types_by_name['Coordinate'] = _COORDINATE
 DESCRIPTOR.message_types_by_name['Edge'] = _EDGE
 DESCRIPTOR.message_types_by_name['EdgeSet'] = _EDGESET
-DESCRIPTOR.message_types_by_name['RadiusSearchRequest'] = _RADIUSSEARCHREQUEST
-DESCRIPTOR.message_types_by_name['RadiusSearchResponse'] = _RADIUSSEARCHRESPONSE
+DESCRIPTOR.message_types_by_name['NearbyEdgesRequest'] = _NEARBYEDGESREQUEST
+DESCRIPTOR.message_types_by_name['NearbyEdgesResponse'] = _NEARBYEDGESRESPONSE
 DESCRIPTOR.message_types_by_name['NextEdgesRequest'] = _NEXTEDGESREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -397,19 +397,19 @@ EdgeSet = _reflection.GeneratedProtocolMessageType('EdgeSet', (_message.Message,
   ))
 _sym_db.RegisterMessage(EdgeSet)
 
-RadiusSearchRequest = _reflection.GeneratedProtocolMessageType('RadiusSearchRequest', (_message.Message,), dict(
-  DESCRIPTOR = _RADIUSSEARCHREQUEST,
+NearbyEdgesRequest = _reflection.GeneratedProtocolMessageType('NearbyEdgesRequest', (_message.Message,), dict(
+  DESCRIPTOR = _NEARBYEDGESREQUEST,
   __module__ = 'openlr_services_pb2'
-  # @@protoc_insertion_point(class_scope:openlr_services.RadiusSearchRequest)
+  # @@protoc_insertion_point(class_scope:openlr_services.NearbyEdgesRequest)
   ))
-_sym_db.RegisterMessage(RadiusSearchRequest)
+_sym_db.RegisterMessage(NearbyEdgesRequest)
 
-RadiusSearchResponse = _reflection.GeneratedProtocolMessageType('RadiusSearchResponse', (_message.Message,), dict(
-  DESCRIPTOR = _RADIUSSEARCHRESPONSE,
+NearbyEdgesResponse = _reflection.GeneratedProtocolMessageType('NearbyEdgesResponse', (_message.Message,), dict(
+  DESCRIPTOR = _NEARBYEDGESRESPONSE,
   __module__ = 'openlr_services_pb2'
-  # @@protoc_insertion_point(class_scope:openlr_services.RadiusSearchResponse)
+  # @@protoc_insertion_point(class_scope:openlr_services.NearbyEdgesResponse)
   ))
-_sym_db.RegisterMessage(RadiusSearchResponse)
+_sym_db.RegisterMessage(NearbyEdgesResponse)
 
 NextEdgesRequest = _reflection.GeneratedProtocolMessageType('NextEdgesRequest', (_message.Message,), dict(
   DESCRIPTOR = _NEXTEDGESREQUEST,
@@ -420,27 +420,27 @@ _sym_db.RegisterMessage(NextEdgesRequest)
 
 
 
-_MAPSERVICE = _descriptor.ServiceDescriptor(
-  name='MapService',
-  full_name='openlr_services.MapService',
+_MAPAGENT = _descriptor.ServiceDescriptor(
+  name='MapAgent',
+  full_name='openlr_services.MapAgent',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=747,
-  serialized_end=926,
+  serialized_start=745,
+  serialized_end=925,
   methods=[
   _descriptor.MethodDescriptor(
-    name='RadiusSearch',
-    full_name='openlr_services.MapService.RadiusSearch',
+    name='GetNearbyEdges',
+    full_name='openlr_services.MapAgent.GetNearbyEdges',
     index=0,
     containing_service=None,
-    input_type=_RADIUSSEARCHREQUEST,
-    output_type=_RADIUSSEARCHRESPONSE,
+    input_type=_NEARBYEDGESREQUEST,
+    output_type=_NEARBYEDGESRESPONSE,
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
-    name='NextEdges',
-    full_name='openlr_services.MapService.NextEdges',
+    name='GetNextEdges',
+    full_name='openlr_services.MapAgent.GetNextEdges',
     index=1,
     containing_service=None,
     input_type=_NEXTEDGESREQUEST,
@@ -448,8 +448,8 @@ _MAPSERVICE = _descriptor.ServiceDescriptor(
     serialized_options=None,
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_MAPSERVICE)
+_sym_db.RegisterServiceDescriptor(_MAPAGENT)
 
-DESCRIPTOR.services_by_name['MapService'] = _MAPSERVICE
+DESCRIPTOR.services_by_name['MapAgent'] = _MAPAGENT
 
 # @@protoc_insertion_point(module_scope)

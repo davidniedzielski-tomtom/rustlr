@@ -2,12 +2,12 @@ import logging
 import grpc
 
 from concurrent import futures
-from ..protos.python import openlr_services_pb2_grpc
+import openlr_services_pb2_grpc
 from pyproj import Geod
 from shapely.geometry import Point, LineString
 from shapely.ops import nearest_points
 from shapely.wkt import loads
-from ..protos.python.openlr_services_pb2 import EdgeSet, Edge, Coordinate, RadiusSearchResponse
+from openlr_services_pb2 import EdgeSet, Edge, Coordinate, NearbyEdgesResponse
 
 
 class MapServiceServicer(openlr_services_pb2_grpc.MapServiceServicer):
@@ -52,14 +52,14 @@ class MapServiceServicer(openlr_services_pb2_grpc.MapServiceServicer):
                 res.append(self.make_edge(e))
         return res
 
-    def RadiusSearch(self, request, context):
+    def GetNearbyEdges(self, request, context):
         res = []
         for p in request.points:
             res.append(EdgeSet(edges=self.find_nearby(
                 float(p.longitude), float(p.latitude), float(request.radius))))
-        return RadiusSearchResponse(edge_sets=res)
+        return NearbyEdgesResponse(edge_sets=res)
 
-    def NextEdges(self, request, context):
+    def GetNextEdges(self, request, context):
         res = []
         src = self.edge_map[request.id]
         return EdgeSet(edges=[self.make_edge(e) for e in self.db if e["from_int"] == src["to_int"] and e["to_int"] != src["from_int"]])

@@ -56,15 +56,7 @@ class EdgeSet(_message.Message):
     edges: _containers.RepeatedCompositeFieldContainer[Edge]
     def __init__(self, edges: _Optional[_Iterable[_Union[Edge, _Mapping]]] = ...) -> None: ...
 
-class NextEdgesRequest(_message.Message):
-    __slots__ = ["id", "meta"]
-    ID_FIELD_NUMBER: _ClassVar[int]
-    META_FIELD_NUMBER: _ClassVar[int]
-    id: int
-    meta: str
-    def __init__(self, id: _Optional[int] = ..., meta: _Optional[str] = ...) -> None: ...
-
-class RadiusSearchRequest(_message.Message):
+class NearbyEdgesRequest(_message.Message):
     __slots__ = ["points", "radius"]
     POINTS_FIELD_NUMBER: _ClassVar[int]
     RADIUS_FIELD_NUMBER: _ClassVar[int]
@@ -72,8 +64,16 @@ class RadiusSearchRequest(_message.Message):
     radius: int
     def __init__(self, points: _Optional[_Iterable[_Union[Coordinate, _Mapping]]] = ..., radius: _Optional[int] = ...) -> None: ...
 
-class RadiusSearchResponse(_message.Message):
+class NearbyEdgesResponse(_message.Message):
     __slots__ = ["edge_sets"]
     EDGE_SETS_FIELD_NUMBER: _ClassVar[int]
     edge_sets: _containers.RepeatedCompositeFieldContainer[EdgeSet]
     def __init__(self, edge_sets: _Optional[_Iterable[_Union[EdgeSet, _Mapping]]] = ...) -> None: ...
+
+class NextEdgesRequest(_message.Message):
+    __slots__ = ["id", "meta"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    META_FIELD_NUMBER: _ClassVar[int]
+    id: int
+    meta: str
+    def __init__(self, id: _Optional[int] = ..., meta: _Optional[str] = ...) -> None: ...
