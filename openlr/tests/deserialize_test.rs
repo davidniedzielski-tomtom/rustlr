@@ -5,7 +5,6 @@ use openlr;
 use openlr::decoding_parameters::DecodingParameters;
 use openlr::location::Location;
 use openlr::log::LogLevel;
-use serde::Serialize;
 
 #[test]
 fn test_decode1() {

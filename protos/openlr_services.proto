@@ -9,6 +9,82 @@ service MapAgent {
 	rpc GetNextEdges (NextEdgesRequest) returns (EdgeSet);
 }
 
+service Decoder {
+	rpc DecodeBinary (stream BinaryDecodeRequest) returns (stream BinaryDecodeResponse);
+}
+
+message LogMessage {
+  LoggingLevel level=1;
+  string msg=2;
+}
+
+message OffsetRange {
+  uint32 lb=1;
+  uint32 ub=2;
+}
+
+message BinaryDecodeResponse {
+  uint64 id = 1;
+  uint64 elapsed_secs = 2;
+  uint32 elapsed_nanosecs = 3;
+  repeated LogMessage log = 4;
+  oneof decoding_result {
+    DecodeError decodeError = 5;
+    LineLocation lineLocation = 6;
+    PointAlongLineLocation pointAlongLineLocation = 7;
+  }
+}
+
+enum LoggingLevel {
+  TRACE=0;
+  DEBUG=1;
+  INFO=2;
+  WARN=3;
+  ERROR=4;
+  FATAL=5;
+}
+
+enum Orientation {
+  NO_OR_UNKNOWN = 0;
+  FIRST_TO_SECOND = 1;
+  SECOND_TO_FIRST = 2;
+  BOTH_DIRECTIONS = 3;
+}
+
+enum SideOfRoad {
+  ON_OR_NOT_APPLICABLE = 0;
+  RIGHT_SIDE = 1;
+  LEFT_SIDE = 2;
+  BOTH_SIDES = 3;
+}
+
+message DecodeError {
+  string reason=1;
+}
+
+message LineLocation {
+  repeated Edge edge=1;
+  OffsetRange pos_off = 2;
+  OffsetRange neg_off = 3;
+}
+
+message PointAlongLineLocation {
+  repeated Edge edge=1;
+  OffsetRange pos_off = 2;
+  SideOfRoad side_of_road = 3;
+  Orientation orientation = 4;
+}
+
+
+message BinaryDecodeRequest {
+  uint64 id = 1;
+  string code = 2;
+  string decoding_parameter_set = 3;
+  string agent_protocol = 4;
+  string agent_name = 5;
+  LoggingLevel logging_level = 6;
+}
+
 message Coordinate {
 	double longitude = 1;
 	double latitude = 2;

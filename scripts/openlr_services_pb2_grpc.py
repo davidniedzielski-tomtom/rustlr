@@ -61,3 +61,45 @@ def add_MapAgentServicer_to_server(servicer, server):
   generic_handler = grpc.method_handlers_generic_handler(
       'openlr_services.MapAgent', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))
+
+
+class DecoderStub(object):
+  # missing associated documentation comment in .proto file
+  pass
+
+  def __init__(self, channel):
+    """Constructor.
+
+    Args:
+      channel: A grpc.Channel.
+    """
+    self.DecodeBinary = channel.stream_stream(
+        '/openlr_services.Decoder/DecodeBinary',
+        request_serializer=openlr__services__pb2.BinaryDecodeRequest.SerializeToString,
+        response_deserializer=openlr__services__pb2.BinaryDecodeResponse.FromString,
+        )
+
+
+class DecoderServicer(object):
+  # missing associated documentation comment in .proto file
+  pass
+
+  def DecodeBinary(self, request_iterator, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+
+def add_DecoderServicer_to_server(servicer, server):
+  rpc_method_handlers = {
+      'DecodeBinary': grpc.stream_stream_rpc_method_handler(
+          servicer.DecodeBinary,
+          request_deserializer=openlr__services__pb2.BinaryDecodeRequest.FromString,
+          response_serializer=openlr__services__pb2.BinaryDecodeResponse.SerializeToString,
+      ),
+  }
+  generic_handler = grpc.method_handlers_generic_handler(
+      'openlr_services.Decoder', rpc_method_handlers)
+  server.add_generic_rpc_handlers((generic_handler,))

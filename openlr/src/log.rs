@@ -12,8 +12,8 @@ pub enum LogLevel {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct LogEntry {
-    level: LogLevel,
-    txt: String,
+    pub level: LogLevel,
+    pub txt: String,
 }
 
 impl LogEntry {

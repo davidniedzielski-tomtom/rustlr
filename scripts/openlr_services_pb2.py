@@ -3,6 +3,7 @@
 
 import sys
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
+from google.protobuf.internal import enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
@@ -19,9 +20,124 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='openlr_services',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x15openlr_services.proto\x12\x0fopenlr_services\"1\n\nCoordinate\x12\x11\n\tlongitude\x18\x01 \x01(\x01\x12\x10\n\x08latitude\x18\x02 \x01(\x01\"\x92\x03\n\x04\x45\x64ge\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04meta\x18\x02 \x01(\t\x12&\n\x03\x66ow\x18\x03 \x01(\x0e\x32\x19.openlr_services.Edge.FOW\x12&\n\x03\x66rc\x18\x04 \x01(\x0e\x32\x19.openlr_services.Edge.FRC\x12\x0b\n\x03len\x18\x05 \x01(\r\x12+\n\x06\x63oords\x18\x06 \x03(\x0b\x32\x1b.openlr_services.Coordinate\"\x8e\x01\n\x03\x46OW\x12\r\n\tUNDEFINED\x10\x00\x12\x0c\n\x08MOTORWAY\x10\x01\x12\x17\n\x13MULTIPLECARRIAGEWAY\x10\x02\x12\x15\n\x11SINGLECARRIAGEWAY\x10\x03\x12\x0e\n\nROUNDABOUT\x10\x04\x12\x11\n\rTRAFFICSQUARE\x10\x05\x12\x0c\n\x08SLIPROAD\x10\x06\x12\t\n\x05OTHER\x10\x07\"U\n\x03\x46RC\x12\x08\n\x04\x46RC0\x10\x00\x12\x08\n\x04\x46RC1\x10\x01\x12\x08\n\x04\x46RC2\x10\x02\x12\x08\n\x04\x46RC3\x10\x03\x12\x08\n\x04\x46RC4\x10\x04\x12\x08\n\x04\x46RC5\x10\x05\x12\x08\n\x04\x46RC6\x10\x06\x12\x08\n\x04\x46RC7\x10\x07\"/\n\x07\x45\x64geSet\x12$\n\x05\x65\x64ges\x18\x01 \x03(\x0b\x32\x15.openlr_services.Edge\"Q\n\x12NearbyEdgesRequest\x12+\n\x06points\x18\x01 \x03(\x0b\x32\x1b.openlr_services.Coordinate\x12\x0e\n\x06radius\x18\x02 \x01(\r\"B\n\x13NearbyEdgesResponse\x12+\n\tedge_sets\x18\x01 \x03(\x0b\x32\x18.openlr_services.EdgeSet\",\n\x10NextEdgesRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04meta\x18\x02 \x01(\t2\xb4\x01\n\x08MapAgent\x12[\n\x0eGetNearbyEdges\x12#.openlr_services.NearbyEdgesRequest\x1a$.openlr_services.NearbyEdgesResponse\x12K\n\x0cGetNextEdges\x12!.openlr_services.NextEdgesRequest\x1a\x18.openlr_services.EdgeSetb\x06proto3')
+  serialized_pb=_b('\n\x15openlr_services.proto\x12\x0fopenlr_services\"G\n\nLogMessage\x12,\n\x05level\x18\x01 \x01(\x0e\x32\x1d.openlr_services.LoggingLevel\x12\x0b\n\x03msg\x18\x02 \x01(\t\"%\n\x0bOffsetRange\x12\n\n\x02lb\x18\x01 \x01(\r\x12\n\n\x02ub\x18\x02 \x01(\r\"\xc6\x02\n\x14\x42inaryDecodeResponse\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x14\n\x0c\x65lapsed_secs\x18\x02 \x01(\x04\x12\x18\n\x10\x65lapsed_nanosecs\x18\x03 \x01(\r\x12(\n\x03log\x18\x04 \x03(\x0b\x32\x1b.openlr_services.LogMessage\x12\x33\n\x0b\x64\x65\x63odeError\x18\x05 \x01(\x0b\x32\x1c.openlr_services.DecodeErrorH\x00\x12\x35\n\x0clineLocation\x18\x06 \x01(\x0b\x32\x1d.openlr_services.LineLocationH\x00\x12I\n\x16pointAlongLineLocation\x18\x07 \x01(\x0b\x32\'.openlr_services.PointAlongLineLocationH\x00\x42\x11\n\x0f\x64\x65\x63oding_result\"\x1d\n\x0b\x44\x65\x63odeError\x12\x0e\n\x06reason\x18\x01 \x01(\t\"\x91\x01\n\x0cLineLocation\x12#\n\x04\x65\x64ge\x18\x01 \x03(\x0b\x32\x15.openlr_services.Edge\x12-\n\x07pos_off\x18\x02 \x01(\x0b\x32\x1c.openlr_services.OffsetRange\x12-\n\x07neg_off\x18\x03 \x01(\x0b\x32\x1c.openlr_services.OffsetRange\"\xd2\x01\n\x16PointAlongLineLocation\x12#\n\x04\x65\x64ge\x18\x01 \x03(\x0b\x32\x15.openlr_services.Edge\x12-\n\x07pos_off\x18\x02 \x01(\x0b\x32\x1c.openlr_services.OffsetRange\x12\x31\n\x0cside_of_road\x18\x03 \x01(\x0e\x32\x1b.openlr_services.SideOfRoad\x12\x31\n\x0borientation\x18\x04 \x01(\x0e\x32\x1c.openlr_services.Orientation\"\xb1\x01\n\x13\x42inaryDecodeRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x1e\n\x16\x64\x65\x63oding_parameter_set\x18\x03 \x01(\t\x12\x16\n\x0e\x61gent_protocol\x18\x04 \x01(\t\x12\x12\n\nagent_name\x18\x05 \x01(\t\x12\x34\n\rlogging_level\x18\x06 \x01(\x0e\x32\x1d.openlr_services.LoggingLevel\"1\n\nCoordinate\x12\x11\n\tlongitude\x18\x01 \x01(\x01\x12\x10\n\x08latitude\x18\x02 \x01(\x01\"\x92\x03\n\x04\x45\x64ge\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04meta\x18\x02 \x01(\t\x12&\n\x03\x66ow\x18\x03 \x01(\x0e\x32\x19.openlr_services.Edge.FOW\x12&\n\x03\x66rc\x18\x04 \x01(\x0e\x32\x19.openlr_services.Edge.FRC\x12\x0b\n\x03len\x18\x05 \x01(\r\x12+\n\x06\x63oords\x18\x06 \x03(\x0b\x32\x1b.openlr_services.Coordinate\"\x8e\x01\n\x03\x46OW\x12\r\n\tUNDEFINED\x10\x00\x12\x0c\n\x08MOTORWAY\x10\x01\x12\x17\n\x13MULTIPLECARRIAGEWAY\x10\x02\x12\x15\n\x11SINGLECARRIAGEWAY\x10\x03\x12\x0e\n\nROUNDABOUT\x10\x04\x12\x11\n\rTRAFFICSQUARE\x10\x05\x12\x0c\n\x08SLIPROAD\x10\x06\x12\t\n\x05OTHER\x10\x07\"U\n\x03\x46RC\x12\x08\n\x04\x46RC0\x10\x00\x12\x08\n\x04\x46RC1\x10\x01\x12\x08\n\x04\x46RC2\x10\x02\x12\x08\n\x04\x46RC3\x10\x03\x12\x08\n\x04\x46RC4\x10\x04\x12\x08\n\x04\x46RC5\x10\x05\x12\x08\n\x04\x46RC6\x10\x06\x12\x08\n\x04\x46RC7\x10\x07\"/\n\x07\x45\x64geSet\x12$\n\x05\x65\x64ges\x18\x01 \x03(\x0b\x32\x15.openlr_services.Edge\"Q\n\x12NearbyEdgesRequest\x12+\n\x06points\x18\x01 \x03(\x0b\x32\x1b.openlr_services.Coordinate\x12\x0e\n\x06radius\x18\x02 \x01(\r\"B\n\x13NearbyEdgesResponse\x12+\n\tedge_sets\x18\x01 \x03(\x0b\x32\x18.openlr_services.EdgeSet\",\n\x10NextEdgesRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04meta\x18\x02 \x01(\t*N\n\x0cLoggingLevel\x12\t\n\x05TRACE\x10\x00\x12\t\n\x05\x44\x45\x42UG\x10\x01\x12\x08\n\x04INFO\x10\x02\x12\x08\n\x04WARN\x10\x03\x12\t\n\x05\x45RROR\x10\x04\x12\t\n\x05\x46\x41TAL\x10\x05*_\n\x0bOrientation\x12\x11\n\rNO_OR_UNKNOWN\x10\x00\x12\x13\n\x0f\x46IRST_TO_SECOND\x10\x01\x12\x13\n\x0fSECOND_TO_FIRST\x10\x02\x12\x13\n\x0f\x42OTH_DIRECTIONS\x10\x03*U\n\nSideOfRoad\x12\x18\n\x14ON_OR_NOT_APPLICABLE\x10\x00\x12\x0e\n\nRIGHT_SIDE\x10\x01\x12\r\n\tLEFT_SIDE\x10\x02\x12\x0e\n\nBOTH_SIDES\x10\x03\x32\xb4\x01\n\x08MapAgent\x12[\n\x0eGetNearbyEdges\x12#.openlr_services.NearbyEdgesRequest\x1a$.openlr_services.NearbyEdgesResponse\x12K\n\x0cGetNextEdges\x12!.openlr_services.NextEdgesRequest\x1a\x18.openlr_services.EdgeSet2j\n\x07\x44\x65\x63oder\x12_\n\x0c\x44\x65\x63odeBinary\x12$.openlr_services.BinaryDecodeRequest\x1a%.openlr_services.BinaryDecodeResponse(\x01\x30\x01\x62\x06proto3')
 )
 
+_LOGGINGLEVEL = _descriptor.EnumDescriptor(
+  name='LoggingLevel',
+  full_name='openlr_services.LoggingLevel',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='TRACE', index=0, number=0,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='DEBUG', index=1, number=1,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='INFO', index=2, number=2,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='WARN', index=3, number=3,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='ERROR', index=4, number=4,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='FATAL', index=5, number=5,
+      serialized_options=None,
+      type=None),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=1757,
+  serialized_end=1835,
+)
+_sym_db.RegisterEnumDescriptor(_LOGGINGLEVEL)
+
+LoggingLevel = enum_type_wrapper.EnumTypeWrapper(_LOGGINGLEVEL)
+_ORIENTATION = _descriptor.EnumDescriptor(
+  name='Orientation',
+  full_name='openlr_services.Orientation',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='NO_OR_UNKNOWN', index=0, number=0,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='FIRST_TO_SECOND', index=1, number=1,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SECOND_TO_FIRST', index=2, number=2,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='BOTH_DIRECTIONS', index=3, number=3,
+      serialized_options=None,
+      type=None),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=1837,
+  serialized_end=1932,
+)
+_sym_db.RegisterEnumDescriptor(_ORIENTATION)
+
+Orientation = enum_type_wrapper.EnumTypeWrapper(_ORIENTATION)
+_SIDEOFROAD = _descriptor.EnumDescriptor(
+  name='SideOfRoad',
+  full_name='openlr_services.SideOfRoad',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='ON_OR_NOT_APPLICABLE', index=0, number=0,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='RIGHT_SIDE', index=1, number=1,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='LEFT_SIDE', index=2, number=2,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='BOTH_SIDES', index=3, number=3,
+      serialized_options=None,
+      type=None),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=1934,
+  serialized_end=2019,
+)
+_sym_db.RegisterEnumDescriptor(_SIDEOFROAD)
+
+SideOfRoad = enum_type_wrapper.EnumTypeWrapper(_SIDEOFROAD)
+TRACE = 0
+DEBUG = 1
+INFO = 2
+WARN = 3
+ERROR = 4
+FATAL = 5
+NO_OR_UNKNOWN = 0
+FIRST_TO_SECOND = 1
+SECOND_TO_FIRST = 2
+BOTH_DIRECTIONS = 3
+ON_OR_NOT_APPLICABLE = 0
+RIGHT_SIDE = 1
+LEFT_SIDE = 2
+BOTH_SIDES = 3
 
 
 _EDGE_FOW = _descriptor.EnumDescriptor(
@@ -65,8 +181,8 @@ _EDGE_FOW = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=267,
-  serialized_end=409,
+  serialized_start=1280,
+  serialized_end=1422,
 )
 _sym_db.RegisterEnumDescriptor(_EDGE_FOW)
 
@@ -111,10 +227,356 @@ _EDGE_FRC = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=411,
-  serialized_end=496,
+  serialized_start=1424,
+  serialized_end=1509,
 )
 _sym_db.RegisterEnumDescriptor(_EDGE_FRC)
+
+
+_LOGMESSAGE = _descriptor.Descriptor(
+  name='LogMessage',
+  full_name='openlr_services.LogMessage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='level', full_name='openlr_services.LogMessage.level', index=0,
+      number=1, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='msg', full_name='openlr_services.LogMessage.msg', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=42,
+  serialized_end=113,
+)
+
+
+_OFFSETRANGE = _descriptor.Descriptor(
+  name='OffsetRange',
+  full_name='openlr_services.OffsetRange',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='lb', full_name='openlr_services.OffsetRange.lb', index=0,
+      number=1, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='ub', full_name='openlr_services.OffsetRange.ub', index=1,
+      number=2, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=115,
+  serialized_end=152,
+)
+
+
+_BINARYDECODERESPONSE = _descriptor.Descriptor(
+  name='BinaryDecodeResponse',
+  full_name='openlr_services.BinaryDecodeResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='openlr_services.BinaryDecodeResponse.id', index=0,
+      number=1, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='elapsed_secs', full_name='openlr_services.BinaryDecodeResponse.elapsed_secs', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='elapsed_nanosecs', full_name='openlr_services.BinaryDecodeResponse.elapsed_nanosecs', index=2,
+      number=3, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='log', full_name='openlr_services.BinaryDecodeResponse.log', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='decodeError', full_name='openlr_services.BinaryDecodeResponse.decodeError', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='lineLocation', full_name='openlr_services.BinaryDecodeResponse.lineLocation', index=5,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='pointAlongLineLocation', full_name='openlr_services.BinaryDecodeResponse.pointAlongLineLocation', index=6,
+      number=7, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='decoding_result', full_name='openlr_services.BinaryDecodeResponse.decoding_result',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=155,
+  serialized_end=481,
+)
+
+
+_DECODEERROR = _descriptor.Descriptor(
+  name='DecodeError',
+  full_name='openlr_services.DecodeError',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='reason', full_name='openlr_services.DecodeError.reason', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=483,
+  serialized_end=512,
+)
+
+
+_LINELOCATION = _descriptor.Descriptor(
+  name='LineLocation',
+  full_name='openlr_services.LineLocation',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='edge', full_name='openlr_services.LineLocation.edge', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='pos_off', full_name='openlr_services.LineLocation.pos_off', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='neg_off', full_name='openlr_services.LineLocation.neg_off', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=515,
+  serialized_end=660,
+)
+
+
+_POINTALONGLINELOCATION = _descriptor.Descriptor(
+  name='PointAlongLineLocation',
+  full_name='openlr_services.PointAlongLineLocation',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='edge', full_name='openlr_services.PointAlongLineLocation.edge', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='pos_off', full_name='openlr_services.PointAlongLineLocation.pos_off', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='side_of_road', full_name='openlr_services.PointAlongLineLocation.side_of_road', index=2,
+      number=3, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='orientation', full_name='openlr_services.PointAlongLineLocation.orientation', index=3,
+      number=4, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=663,
+  serialized_end=873,
+)
+
+
+_BINARYDECODEREQUEST = _descriptor.Descriptor(
+  name='BinaryDecodeRequest',
+  full_name='openlr_services.BinaryDecodeRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='openlr_services.BinaryDecodeRequest.id', index=0,
+      number=1, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='code', full_name='openlr_services.BinaryDecodeRequest.code', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='decoding_parameter_set', full_name='openlr_services.BinaryDecodeRequest.decoding_parameter_set', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='agent_protocol', full_name='openlr_services.BinaryDecodeRequest.agent_protocol', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='agent_name', full_name='openlr_services.BinaryDecodeRequest.agent_name', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='logging_level', full_name='openlr_services.BinaryDecodeRequest.logging_level', index=5,
+      number=6, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=876,
+  serialized_end=1053,
+)
 
 
 _COORDINATE = _descriptor.Descriptor(
@@ -150,8 +612,8 @@ _COORDINATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=42,
-  serialized_end=91,
+  serialized_start=1055,
+  serialized_end=1104,
 )
 
 
@@ -218,8 +680,8 @@ _EDGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=94,
-  serialized_end=496,
+  serialized_start=1107,
+  serialized_end=1509,
 )
 
 
@@ -249,8 +711,8 @@ _EDGESET = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=498,
-  serialized_end=545,
+  serialized_start=1511,
+  serialized_end=1558,
 )
 
 
@@ -287,8 +749,8 @@ _NEARBYEDGESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=547,
-  serialized_end=628,
+  serialized_start=1560,
+  serialized_end=1641,
 )
 
 
@@ -318,8 +780,8 @@ _NEARBYEDGESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=630,
-  serialized_end=696,
+  serialized_start=1643,
+  serialized_end=1709,
 )
 
 
@@ -356,10 +818,32 @@ _NEXTEDGESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=698,
-  serialized_end=742,
+  serialized_start=1711,
+  serialized_end=1755,
 )
 
+_LOGMESSAGE.fields_by_name['level'].enum_type = _LOGGINGLEVEL
+_BINARYDECODERESPONSE.fields_by_name['log'].message_type = _LOGMESSAGE
+_BINARYDECODERESPONSE.fields_by_name['decodeError'].message_type = _DECODEERROR
+_BINARYDECODERESPONSE.fields_by_name['lineLocation'].message_type = _LINELOCATION
+_BINARYDECODERESPONSE.fields_by_name['pointAlongLineLocation'].message_type = _POINTALONGLINELOCATION
+_BINARYDECODERESPONSE.oneofs_by_name['decoding_result'].fields.append(
+  _BINARYDECODERESPONSE.fields_by_name['decodeError'])
+_BINARYDECODERESPONSE.fields_by_name['decodeError'].containing_oneof = _BINARYDECODERESPONSE.oneofs_by_name['decoding_result']
+_BINARYDECODERESPONSE.oneofs_by_name['decoding_result'].fields.append(
+  _BINARYDECODERESPONSE.fields_by_name['lineLocation'])
+_BINARYDECODERESPONSE.fields_by_name['lineLocation'].containing_oneof = _BINARYDECODERESPONSE.oneofs_by_name['decoding_result']
+_BINARYDECODERESPONSE.oneofs_by_name['decoding_result'].fields.append(
+  _BINARYDECODERESPONSE.fields_by_name['pointAlongLineLocation'])
+_BINARYDECODERESPONSE.fields_by_name['pointAlongLineLocation'].containing_oneof = _BINARYDECODERESPONSE.oneofs_by_name['decoding_result']
+_LINELOCATION.fields_by_name['edge'].message_type = _EDGE
+_LINELOCATION.fields_by_name['pos_off'].message_type = _OFFSETRANGE
+_LINELOCATION.fields_by_name['neg_off'].message_type = _OFFSETRANGE
+_POINTALONGLINELOCATION.fields_by_name['edge'].message_type = _EDGE
+_POINTALONGLINELOCATION.fields_by_name['pos_off'].message_type = _OFFSETRANGE
+_POINTALONGLINELOCATION.fields_by_name['side_of_road'].enum_type = _SIDEOFROAD
+_POINTALONGLINELOCATION.fields_by_name['orientation'].enum_type = _ORIENTATION
+_BINARYDECODEREQUEST.fields_by_name['logging_level'].enum_type = _LOGGINGLEVEL
 _EDGE.fields_by_name['fow'].enum_type = _EDGE_FOW
 _EDGE.fields_by_name['frc'].enum_type = _EDGE_FRC
 _EDGE.fields_by_name['coords'].message_type = _COORDINATE
@@ -368,13 +852,72 @@ _EDGE_FRC.containing_type = _EDGE
 _EDGESET.fields_by_name['edges'].message_type = _EDGE
 _NEARBYEDGESREQUEST.fields_by_name['points'].message_type = _COORDINATE
 _NEARBYEDGESRESPONSE.fields_by_name['edge_sets'].message_type = _EDGESET
+DESCRIPTOR.message_types_by_name['LogMessage'] = _LOGMESSAGE
+DESCRIPTOR.message_types_by_name['OffsetRange'] = _OFFSETRANGE
+DESCRIPTOR.message_types_by_name['BinaryDecodeResponse'] = _BINARYDECODERESPONSE
+DESCRIPTOR.message_types_by_name['DecodeError'] = _DECODEERROR
+DESCRIPTOR.message_types_by_name['LineLocation'] = _LINELOCATION
+DESCRIPTOR.message_types_by_name['PointAlongLineLocation'] = _POINTALONGLINELOCATION
+DESCRIPTOR.message_types_by_name['BinaryDecodeRequest'] = _BINARYDECODEREQUEST
 DESCRIPTOR.message_types_by_name['Coordinate'] = _COORDINATE
 DESCRIPTOR.message_types_by_name['Edge'] = _EDGE
 DESCRIPTOR.message_types_by_name['EdgeSet'] = _EDGESET
 DESCRIPTOR.message_types_by_name['NearbyEdgesRequest'] = _NEARBYEDGESREQUEST
 DESCRIPTOR.message_types_by_name['NearbyEdgesResponse'] = _NEARBYEDGESRESPONSE
 DESCRIPTOR.message_types_by_name['NextEdgesRequest'] = _NEXTEDGESREQUEST
+DESCRIPTOR.enum_types_by_name['LoggingLevel'] = _LOGGINGLEVEL
+DESCRIPTOR.enum_types_by_name['Orientation'] = _ORIENTATION
+DESCRIPTOR.enum_types_by_name['SideOfRoad'] = _SIDEOFROAD
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+LogMessage = _reflection.GeneratedProtocolMessageType('LogMessage', (_message.Message,), dict(
+  DESCRIPTOR = _LOGMESSAGE,
+  __module__ = 'openlr_services_pb2'
+  # @@protoc_insertion_point(class_scope:openlr_services.LogMessage)
+  ))
+_sym_db.RegisterMessage(LogMessage)
+
+OffsetRange = _reflection.GeneratedProtocolMessageType('OffsetRange', (_message.Message,), dict(
+  DESCRIPTOR = _OFFSETRANGE,
+  __module__ = 'openlr_services_pb2'
+  # @@protoc_insertion_point(class_scope:openlr_services.OffsetRange)
+  ))
+_sym_db.RegisterMessage(OffsetRange)
+
+BinaryDecodeResponse = _reflection.GeneratedProtocolMessageType('BinaryDecodeResponse', (_message.Message,), dict(
+  DESCRIPTOR = _BINARYDECODERESPONSE,
+  __module__ = 'openlr_services_pb2'
+  # @@protoc_insertion_point(class_scope:openlr_services.BinaryDecodeResponse)
+  ))
+_sym_db.RegisterMessage(BinaryDecodeResponse)
+
+DecodeError = _reflection.GeneratedProtocolMessageType('DecodeError', (_message.Message,), dict(
+  DESCRIPTOR = _DECODEERROR,
+  __module__ = 'openlr_services_pb2'
+  # @@protoc_insertion_point(class_scope:openlr_services.DecodeError)
+  ))
+_sym_db.RegisterMessage(DecodeError)
+
+LineLocation = _reflection.GeneratedProtocolMessageType('LineLocation', (_message.Message,), dict(
+  DESCRIPTOR = _LINELOCATION,
+  __module__ = 'openlr_services_pb2'
+  # @@protoc_insertion_point(class_scope:openlr_services.LineLocation)
+  ))
+_sym_db.RegisterMessage(LineLocation)
+
+PointAlongLineLocation = _reflection.GeneratedProtocolMessageType('PointAlongLineLocation', (_message.Message,), dict(
+  DESCRIPTOR = _POINTALONGLINELOCATION,
+  __module__ = 'openlr_services_pb2'
+  # @@protoc_insertion_point(class_scope:openlr_services.PointAlongLineLocation)
+  ))
+_sym_db.RegisterMessage(PointAlongLineLocation)
+
+BinaryDecodeRequest = _reflection.GeneratedProtocolMessageType('BinaryDecodeRequest', (_message.Message,), dict(
+  DESCRIPTOR = _BINARYDECODEREQUEST,
+  __module__ = 'openlr_services_pb2'
+  # @@protoc_insertion_point(class_scope:openlr_services.BinaryDecodeRequest)
+  ))
+_sym_db.RegisterMessage(BinaryDecodeRequest)
 
 Coordinate = _reflection.GeneratedProtocolMessageType('Coordinate', (_message.Message,), dict(
   DESCRIPTOR = _COORDINATE,
@@ -426,8 +969,8 @@ _MAPAGENT = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=745,
-  serialized_end=925,
+  serialized_start=2022,
+  serialized_end=2202,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetNearbyEdges',
@@ -451,5 +994,29 @@ _MAPAGENT = _descriptor.ServiceDescriptor(
 _sym_db.RegisterServiceDescriptor(_MAPAGENT)
 
 DESCRIPTOR.services_by_name['MapAgent'] = _MAPAGENT
+
+
+_DECODER = _descriptor.ServiceDescriptor(
+  name='Decoder',
+  full_name='openlr_services.Decoder',
+  file=DESCRIPTOR,
+  index=1,
+  serialized_options=None,
+  serialized_start=2204,
+  serialized_end=2310,
+  methods=[
+  _descriptor.MethodDescriptor(
+    name='DecodeBinary',
+    full_name='openlr_services.Decoder.DecodeBinary',
+    index=0,
+    containing_service=None,
+    input_type=_BINARYDECODEREQUEST,
+    output_type=_BINARYDECODERESPONSE,
+    serialized_options=None,
+  ),
+])
+_sym_db.RegisterServiceDescriptor(_DECODER)
+
+DESCRIPTOR.services_by_name['Decoder'] = _DECODER
 
 # @@protoc_insertion_point(module_scope)

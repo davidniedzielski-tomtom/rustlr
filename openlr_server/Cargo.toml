@@ -22,6 +22,8 @@ prost = "0.10.4"
 tonic = "0.7.2"
 log="0.4.17"
 simple_logger = "4.0.0"
+tokio-stream = { version = "0.1.11", optional = false }   
+h2 = { version = "0.3", optional = false }
 
 [build-dependencies]
 tonic-build = "0.7.2"

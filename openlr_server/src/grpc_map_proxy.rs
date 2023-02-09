@@ -1,37 +1,14 @@
-pub mod openlr_services {
-    tonic::include_proto!("openlr_services");
-}
-
-use crate::grpc_map_proxy::openlr_services::{
-    map_agent_client::MapAgentClient, Coordinate, NextEdgesRequest,
-    NearbyEdgesRequest,
-};
-
 use async_trait::async_trait;
-use geo::{Coord, LineString};
-use openlr::{edge::Edge, errors::OpenLrErr, fow::FOW, frc::FRC, map::Map};
+use crate::common::edge_from_proto_edge;
+use geo::Coord;
+use openlr::{edge::Edge, errors::OpenLrErr, map::Map};
 use reqwest::Url;
 use tonic::transport::Channel;
 
-
-fn edge_from_proto_edge(e: &crate::grpc_map_proxy::openlr_services::Edge) -> Edge {
-    Edge {
-        id: e.id,
-        meta: e.meta.clone(),
-        fow: FOW::from_u8(e.fow as u8),
-        frc: FRC::from_u8(e.frc as u8),
-        len: e.len,
-        geom: LineString(
-            e.coords
-                .iter()
-                .map(|c| Coord {
-                    x: c.longitude,
-                    y: c.latitude,
-                })
-                .collect::<Vec<Coord>>(),
-        ),
-    }
-}
+use crate::openlr_services::{
+    map_agent_client::MapAgentClient, Coordinate, NextEdgesRequest,
+    NearbyEdgesRequest,
+};
 
 pub struct GRPCMapProxy<Channel> {
     client: MapAgentClient<Channel>,
