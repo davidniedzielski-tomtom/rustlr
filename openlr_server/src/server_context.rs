@@ -1,5 +1,6 @@
 use openlr::{map::Map, decoding_parameters::DecodingParameters};
-use std::{collections::HashMap, sync::{Mutex, Arc}};
+use tokio::sync::Mutex;
+use std::{collections::HashMap, sync::Arc};
 use url::Url;
 
 pub struct ServerContext {
@@ -20,16 +21,16 @@ impl ServerContext {
         }
     }
 
-    pub fn add_map_database(&mut self, key:Url, value: Arc<dyn Map>) {
-        self.mdbs.lock().unwrap().insert(key,value);
+    pub async fn add_map_database(&mut self, key:Url, value: Arc<dyn Map>) {
+        self.mdbs.lock().await.insert(key,value);
     }
 
-    pub fn add_param_set(&mut self, key:String, value: DecodingParameters) {
-        self.params.lock().unwrap().insert(key, Arc::new(value));
+    pub async fn add_param_set(&mut self, key:String, value: DecodingParameters) {
+        self.params.lock().await.insert(key, Arc::new(value));
     }
 
-    pub fn get_param_set(&self, key:&String) -> Option<Arc<DecodingParameters>>  {
-        match self.params.lock().unwrap().get(key) {
+    pub async fn get_param_set(&self, key:&String) -> Option<Arc<DecodingParameters>>  {
+        match self.params.lock().await.get(key) {
             Some(params) => Some(params.clone()),
             _ =>   None
         }

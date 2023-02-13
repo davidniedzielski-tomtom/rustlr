@@ -56,7 +56,7 @@ async fn decode(
     };
 
     // Retreive a cached Map for the chosen URL, or else create a new one
-    let mut mdbs = context.mdbs.lock().unwrap();
+    let mut mdbs = context.mdbs.lock().await;
 
     let mdb = match mdbs.entry(url) {
         Entry::Occupied(e) => (*e.into_mut()).clone(),
@@ -72,11 +72,11 @@ async fn decode(
         }
     };
 
-    // Drop the lock on the map hash early so that later mapnics do not poison the mutex
+    // Drop the lock on the map hash early so that later panics do not poison the mutex
     drop(mdbs);
 
     // Retreive the request paramter set from the server context
-    let parameter_set = match context.get_param_set(&params.params_key) {
+    let parameter_set = match context.get_param_set(&params.params_key).await {
         Some(x) => x.clone(),
         _ => return HttpResponse::BadRequest().body("Unknown parameter set"),
     };
