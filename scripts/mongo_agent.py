@@ -94,7 +94,7 @@ class MapAgentServicer(openlr_services_pb2_grpc.MapAgentServicer):
                 if abs(request.id) != succ["properties"]["id"]:
                     # Reverse the successor of needed 
                     if succ["properties"]["to_int"] == src_int:
-                        res.append(self.make_edge_reverse(succ))
+                        res.append(self.make_edge_reversed(succ))
                     else:
                         res.append(self.make_edge(succ))
         return EdgeSet(edges=res)
